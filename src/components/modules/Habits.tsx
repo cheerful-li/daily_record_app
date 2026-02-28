@@ -1,0 +1,122 @@
+import { useState, useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useHabitStore, useCheckInStore } from '../../stores/StoreContext';
+import { Button } from '../ui/button';
+import { MixerHorizontalIcon, EyeOpenIcon, GearIcon, ClockIcon } from '@radix-ui/react-icons';
+import type { Habit, CheckIn } from '../../services/database';
+import HabitsList from './habits/HabitsList';
+// import HabitForm from './habits/HabitForm'; // 已移至设置页面
+// 已移除打卡表单弹窗，改为直接打卡
+// 已移除打卡历史组件，改为独立页面
+import { filterCheckableHabits } from '../../utils/habitUtils';
+
+const Habits = observer(() => {
+  const habitStore = useHabitStore();
+  const checkInStore = useCheckInStore();
+  
+  // 习惯管理操作已移至设置页面
+  // 删除不需要的状态（打卡弹窗相关）
+  const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>();
+  const [showOnlyActive, setShowOnlyActive] = useState(true);
+  const [showOnlyCheckable, setShowOnlyCheckable] = useState(true);
+  // 已移除打卡历史相关状态
+
+  useEffect(() => {
+    habitStore.loadHabits();
+    checkInStore.loadCheckIns();
+  }, [habitStore, checkInStore]);
+
+  // 习惯管理操作已移至设置页面
+
+  // 直接完成打卡，不弹出备注窗口
+  const handleCheckIn = async (habitId: number | undefined, status: 'completed' | 'half-completed' | 'skipped') => {
+    if (habitId) {
+      const checkInData = {
+        habitId,
+        date: new Date(),
+        status,
+        note: '' // 空备注
+      };
+      
+      await checkInStore.addCheckIn(checkInData);
+      // 不再在主页面显示打卡历史
+    }
+  };
+
+  // 删除不需要的方法（打卡弹窗相关）
+
+  // 习惯管理操作已移至设置页面
+
+  // 首先根据活跃状态过滤
+  const activeFilteredHabits = showOnlyActive ? 
+    habitStore.habits.filter(habit => habit.active) : 
+    habitStore.habits;
+    
+  // 然后根据打卡可用性过滤
+  const filteredHabits = showOnlyCheckable ?
+    filterCheckableHabits(activeFilteredHabits, checkInStore.checkIns) :
+    activeFilteredHabits;
+
+  // 已移除打卡历史相关方法
+
+  return (
+    <div className="container mx-auto">
+      <div className="mb-4 flex items-center justify-between flex-wrap">
+        <h1 className="text-3xl font-bold hidden md:block">微习惯打卡</h1>
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowOnlyActive(!showOnlyActive)}
+            className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
+          >
+            <MixerHorizontalIcon className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:inline">{showOnlyActive ? '显示全部习惯' : '仅活跃习惯'}</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowOnlyCheckable(!showOnlyCheckable)}
+            className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
+          >
+            <EyeOpenIcon className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:inline">{showOnlyCheckable ? '显示所有习惯' : '仅显示可打卡'}</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => { window.location.href = '#/habit-settings' }}
+            className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
+          >
+            <GearIcon className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:inline">习惯设置</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => { window.location.href = '#/checkin-history' }}
+            className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
+          >
+            <ClockIcon className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:inline">打卡历史</span>
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid gap-6">
+        <div>
+          {habitStore.loading ? (
+            <p>加载中...</p>
+          ) : (
+            <HabitsList 
+              habits={filteredHabits} 
+              onCheckIn={handleCheckIn}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* 习惯管理对话框已移至设置页面 */}
+
+      {/* 打卡弹窗已被移除，改为直接打卡 */}
+    </div>
+  );
+});
+
+export default Habits;

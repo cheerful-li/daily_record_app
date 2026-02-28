@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun create:*)",
+      "Bash(bun install)",
+      "Bash(rm:*)",
+      "Bash(npm create vite@latest . -- --template react-ts)",
+      "Bash(npm init -y)",
+      "Bash(npm install vite react react-dom typescript @types/react @types/react-dom)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(bun:*)",
+      "Bash(npm run dev)",
+      "Bash(npx vite --version)",
+      "Bash(curl:*)",
+      "Bash(npx vite)",
+      "Bash(tsc:*)",
+      "Bash(npx shadcn-ui@latest add)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm dlx shadcn@latest add tabs)",
+      "Bash(pnpm --version)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(pnpm dlx shadcn@latest add popover)",
+      "Bash(grep:*)",
+      "Bash(pnpm dlx shadcn@latest add date-picker)",
+      "Bash(npx shadcn@latest list)",
+      "mcp__mcp-bun__SearchBun",
+      "Bash(npx tsc --noEmit)",
+      "Bash(pnpm add -D tailwindcss-animate)",
+      "Bash(pnpm add react-day-picker date-fns)",
+      "Bash(pnpm run typecheck)",
+      "Bash(pnpm add recharts)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(pnpm add crypto-js @types/crypto-js)",
+      "Bash(pnpm add lucide-react)"
+    ],
+    "deny": []
+  }
+}
