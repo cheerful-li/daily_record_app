@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { initDatabase } from "./services/database";
-import { addSampleData } from "./services/sampleData";
 import { fetchCloudData } from "./services/cloudSync";
 import { importData } from "./services/enhancedDatabase";
 import { StoreProvider } from "./stores/StoreContext";
-import Layout from "./components/layout/Layout";
-import ModuleRenderer from "./components/modules";
 import { Toaster } from "./components/ui/sonner";
 import { showSuccess, showError } from "./lib/toast";
 import PasswordDialog from "./components/auth/PasswordDialog";
-import { isAuthenticated } from "./utils/auth";
 
 function App() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [hasData, setHasData] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -158,6 +156,7 @@ function App() {
               className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-lg px-6 py-3 text-md font-medium transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => {
                 setHasData(true);
+                navigate('/app/habits');
                 showSuccess("欢迎使用Daily Record个人管理系统！");
               }}
             >
@@ -169,15 +168,13 @@ function App() {
     );
   }
 
-  // 正常显示应用
-  return (
-    <StoreProvider>
-      <Layout>
-        <ModuleRenderer />
-      </Layout>
-      <Toaster position="top-right" closeButton richColors />
-    </StoreProvider>
-  );
+  // 如果有数据，跳转到主应用
+  if (hasData) {
+    navigate('/app', { replace: true });
+    return null;
+  }
+
+  return null;
 }
 
 export default App;

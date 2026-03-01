@@ -36,7 +36,7 @@ const CheckInHistoryPage = observer(() => {
   }, [habitStore, checkInStore]);
 
   const handleBackToDashboard = () => {
-    navigate('/');
+    navigate('/app/habits');
   };
 
   // 根据时间范围过滤打卡记录

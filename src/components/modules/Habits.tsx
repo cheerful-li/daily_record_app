@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
+import { useNavigate } from 'react-router-dom';
 import { useHabitStore, useCheckInStore } from '../../stores/StoreContext';
 import { Button } from '../ui/button';
 import { MixerHorizontalIcon, EyeOpenIcon, GearIcon, ClockIcon } from '@radix-ui/react-icons';
 import type { Habit, CheckIn } from '../../services/database';
 import HabitsList from './habits/HabitsList';
-// import HabitForm from './habits/HabitForm'; // 已移至设置页面
-// 已移除打卡表单弹窗，改为直接打卡
-// 已移除打卡历史组件，改为独立页面
 import { filterCheckableHabits } from '../../utils/habitUtils';
 
 const Habits = observer(() => {
+  const navigate = useNavigate();
   const habitStore = useHabitStore();
   const checkInStore = useCheckInStore();
   
@@ -80,17 +79,17 @@ const Habits = observer(() => {
             <EyeOpenIcon className="md:mr-2 h-4 w-4" />
             <span className="hidden md:inline">{showOnlyCheckable ? '显示所有习惯' : '仅显示可打卡'}</span>
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => { window.location.href = '#/habit-settings' }}
+          <Button
+            variant="outline"
+            onClick={() => navigate('/habit-settings')}
             className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
           >
             <GearIcon className="md:mr-2 h-4 w-4" />
             <span className="hidden md:inline">习惯设置</span>
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => { window.location.href = '#/checkin-history' }}
+          <Button
+            variant="outline"
+            onClick={() => navigate('/checkin-history')}
             className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
           >
             <ClockIcon className="md:mr-2 h-4 w-4" />
@@ -104,9 +103,10 @@ const Habits = observer(() => {
           {habitStore.loading ? (
             <p>加载中...</p>
           ) : (
-            <HabitsList 
-              habits={filteredHabits} 
+            <HabitsList
+              habits={filteredHabits}
               onCheckIn={handleCheckIn}
+              totalHabitsCount={activeFilteredHabits.length}
             />
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { format, parseISO, subDays, addDays, startOfWeek, eachDayOfInterval } from "date-fns";
+import { format, subDays, addDays, startOfWeek, eachDayOfInterval } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useCheckInStore, useHabitStore } from "../../stores/StoreContext";
@@ -17,7 +17,6 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
   const [heatmapData, setHeatmapData] = useState<{
     [key: string]: { value: number; checkIns: CheckIn[] };
   }>({});
-  const [maxValue, setMaxValue] = useState<number>(0);
   
   // 计算热力图数据
   useEffect(() => {
@@ -55,74 +54,92 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
         data[dateStr].checkIns.push(checkIn);
       }
     });
-    
-    // 找出最大值，用于颜色梯度计算
-    const max = Math.max(...Object.values(data).map(d => d.value));
-    setMaxValue(max);
-    
+
     setHeatmapData(data);
   }, [checkInStore.checkIns, weeks]);
   
+  // 根据打卡次数确定颜色级别
+  const getColorClass = (value: number) => {
+    if (value === 0) return 'bg-slate-100 dark:bg-slate-800';
+    if (value <= 0.5) return 'bg-emerald-200 dark:bg-emerald-900/50';
+    if (value <= 1) return 'bg-emerald-300 dark:bg-emerald-800';
+    if (value <= 2) return 'bg-emerald-400 dark:bg-emerald-700';
+    if (value <= 3) return 'bg-emerald-500 dark:bg-emerald-600';
+    return 'bg-emerald-600 dark:bg-emerald-500';
+  };
+
   // 生成热力图日期格子
   const generateHeatmapCells = () => {
     const today = new Date();
     const startDay = subDays(today, weeks * 7);
     const firstDayOfGrid = startOfWeek(startDay, { locale: zhCN });
-    
-    const days = [];
-    const weekLabels = [];
-    
-    // 生成周标签
-    for (let i = 0; i < 7; i++) {
-      weekLabels.push(
-        <div key={`label-${i}`} className="text-xs text-muted-foreground text-center h-7 flex items-center justify-center">
-          {format(addDays(firstDayOfGrid, i), 'EEE', { locale: zhCN })}
-        </div>
-      );
-    }
-    
-    // 生成日期格子
+
+    // 生成所有日期数据
+    const allDates: { date: Date; dateStr: string; isToday: boolean; value: number; checkIns: CheckIn[] }[] = [];
     for (let week = 0; week < weeks; week++) {
-      const weekDays = [];
       for (let day = 0; day < 7; day++) {
         const date = addDays(firstDayOfGrid, week * 7 + day);
         const dateStr = format(date, "yyyy-MM-dd");
         const isToday = format(today, "yyyy-MM-dd") === dateStr;
         const dayData = heatmapData[dateStr] || { value: 0, checkIns: [] };
-        
-        // 颜色梯度计算
-        const intensity = maxValue > 0 ? dayData.value / maxValue : 0;
-        
-        weekDays.push(
-          <div
-            key={dateStr}
-            title={`${dateStr}: ${dayData.checkIns.length}次打卡`}
-            className={`
-              w-7 h-7 rounded-sm border flex items-center justify-center text-xs
-              ${isToday ? 'border-primary' : 'border-border'}
-              ${intensity > 0 
-                ? `bg-primary bg-opacity-${Math.max(5, Math.round(intensity * 100))}`
-                : 'bg-muted bg-opacity-20'}
-            `}
-          >
-            {format(date, 'd')}
-          </div>
-        );
+        allDates.push({
+          date,
+          dateStr,
+          isToday,
+          value: dayData.value,
+          checkIns: dayData.checkIns,
+        });
       }
-      days.push(
-        <div key={`week-${week}`} className="flex gap-1">
-          {weekDays}
+    }
+
+    // 生成星期标签（纵向排列）
+    const weekLabels = [];
+    for (let i = 0; i < 7; i++) {
+      const labelDate = addDays(firstDayOfGrid, i);
+      weekLabels.push(
+        <div key={`label-${i}`} className="text-xs text-muted-foreground w-7 h-7 flex items-center justify-center">
+          {format(labelDate, 'EEEEE', { locale: zhCN })}
         </div>
       );
     }
-    
+
+    // 按星期几分组（0=周一, 6=周日）
+    const dayOfWeekRows = [];
+    for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+      const rowCells = [];
+      for (let week = 0; week < weeks; week++) {
+        const index = week * 7 + dayOfWeek;
+        const dayData = allDates[index];
+        if (dayData) {
+          rowCells.push(
+            <div
+              key={dayData.dateStr}
+              title={`${dayData.dateStr}: ${dayData.checkIns.length}次打卡`}
+              className={`
+                w-7 h-7 rounded-sm border flex items-center justify-center text-[10px]
+                ${dayData.isToday ? 'border-primary border-2' : 'border-border'}
+                ${getColorClass(dayData.value)}
+              `}
+            >
+              {format(dayData.date, 'd')}
+            </div>
+          );
+        }
+      }
+      dayOfWeekRows.push(
+        <div key={`row-${dayOfWeek}`} className="flex gap-1">
+          {rowCells}
+        </div>
+      );
+    }
+
     return (
-      <div className="flex gap-2">
-        <div className="flex flex-col gap-1 mt-7">
+      <div className="flex gap-1">
+        <div className="flex flex-col">
           {weekLabels}
         </div>
         <div className="flex flex-col gap-1">
-          {days}
+          {dayOfWeekRows}
         </div>
       </div>
     );
@@ -141,11 +158,12 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
           <div className="flex items-center gap-1">
             <span>少</span>
             <div className="flex gap-1">
-              <div className="w-3 h-3 bg-muted bg-opacity-20 rounded-sm"></div>
-              <div className="w-3 h-3 bg-primary bg-opacity-20 rounded-sm"></div>
-              <div className="w-3 h-3 bg-primary bg-opacity-40 rounded-sm"></div>
-              <div className="w-3 h-3 bg-primary bg-opacity-60 rounded-sm"></div>
-              <div className="w-3 h-3 bg-primary bg-opacity-80 rounded-sm"></div>
+              <div className="w-3 h-3 bg-slate-100 dark:bg-slate-800 rounded-sm border border-border"></div>
+              <div className="w-3 h-3 bg-emerald-200 dark:bg-emerald-900/50 rounded-sm"></div>
+              <div className="w-3 h-3 bg-emerald-300 dark:bg-emerald-800 rounded-sm"></div>
+              <div className="w-3 h-3 bg-emerald-400 dark:bg-emerald-700 rounded-sm"></div>
+              <div className="w-3 h-3 bg-emerald-500 dark:bg-emerald-600 rounded-sm"></div>
+              <div className="w-3 h-3 bg-emerald-600 dark:bg-emerald-500 rounded-sm"></div>
             </div>
             <span>多</span>
           </div>

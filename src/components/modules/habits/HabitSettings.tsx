@@ -62,7 +62,7 @@ const HabitSettings = observer(() => {
   };
 
   const handleBackToDashboard = () => {
-    navigate('/');
+    navigate('/app/habits');
   };
 
   return (

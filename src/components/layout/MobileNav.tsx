@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { Link, useLocation } from "react-router-dom";
 import { useUIStore } from "../../stores/StoreContext";
 import {
   CheckCircledIcon,
@@ -9,50 +10,26 @@ import {
   PieChartIcon,
   MoonIcon,
   SunIcon,
-  GearIcon,
 } from "@radix-ui/react-icons";
 import { Button } from "../ui/button";
+import { cn } from "../../lib/utils";
+
+const navItems = [
+  { path: "/app/habits", id: "habits", label: "微习惯", icon: CheckCircledIcon },
+  { path: "/app/life-moments", id: "lifeMoments", label: "点滴", icon: ClockIcon },
+  { path: "/app/tasks", id: "tasks", label: "待办", icon: CalendarIcon },
+  { path: "/app/relationships", id: "relationships", label: "社交", icon: PersonIcon },
+  { path: "/app/ideas", id: "ideas", label: "灵感", icon: LightningBoltIcon },
+  { path: "/app/statistics", id: "statistics", label: "统计", icon: PieChartIcon },
+];
 
 const MobileNav = observer(() => {
   const uiStore = useUIStore();
-
-  const handleNavClick = (module: string) => {
-    uiStore.setActiveModule(module);
-  };
+  const location = useLocation();
 
   const toggleTheme = () => {
     uiStore.toggleTheme();
   };
-
-  // 导航项配置
-  const navItems = [
-    {
-      id: "habits",
-      label: "微习惯",
-      icon: <CheckCircledIcon className="h-4 w-4" />,
-    },
-    {
-      id: "lifeMoments",
-      label: "点滴",
-      icon: <ClockIcon className="h-4 w-4" />,
-    },
-    { id: "tasks", label: "待办", icon: <CalendarIcon className="h-4 w-4" /> },
-    {
-      id: "relationships",
-      label: "社交",
-      icon: <PersonIcon className="h-4 w-4" />,
-    },
-    {
-      id: "ideas",
-      label: "灵感",
-      icon: <LightningBoltIcon className="h-4 w-4" />,
-    },
-    {
-      id: "statistics",
-      label: "统计",
-      icon: <PieChartIcon className="h-4 w-4" />,
-    },
-  ];
 
   return (
     <>
@@ -72,20 +49,27 @@ const MobileNav = observer(() => {
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background backdrop-blur-md shadow-md md:hidden">
         <div className="grid grid-cols-6 w-full">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              className={`flex flex-col items-center justify-center py-2 px-1 transition-colors ${
-                uiStore.activeModule === item.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent/10"
-              }`}
-              onClick={() => handleNavClick(item.id)}
-            >
-              <span className="mb-1">{item.icon}</span>
-              <span className="text-[10px]">{item.label}</span>
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+            return (
+              <Link
+                key={item.id}
+                to={item.path}
+                className={cn(
+                  "flex flex-col items-center justify-center py-2 px-1 transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-accent/10"
+                )}
+              >
+                <span className="mb-1">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="text-[10px]">{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </>
