@@ -80,47 +80,9 @@ const HabitCard = observer(({ habit, onCheckIn }: HabitCardProps) => {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            if (nextCheckInDate > today) {
-              return (
-                <div className="mt-3 pt-2 border-t border-dashed border-slate-200 dark:border-slate-700/40">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <svg
-                        className="w-3 h-3 opacity-60"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 8V12L15 15"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      上次: {formatDate(lastCheckInDate)}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-medium text-primary/80">
-                      <svg
-                        className="w-3 h-3 opacity-60"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeMiterlimit="10"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      下次: {formatDate(nextCheckInDate)}
-                    </span>
-                  </div>
-                </div>
-              );
-            }
+            // 删除上次和下次日期显示
+            // 如果需要添加其他内容可以在这里增加
+            return null;
           }
           return null;
         })()}

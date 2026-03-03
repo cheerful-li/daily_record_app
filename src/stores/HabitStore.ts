@@ -43,7 +43,8 @@ class HabitStore {
       
       if (newHabit) {
         runInAction(() => {
-          this.habits.push(newHabit as Habit);
+          // 创建新数组以确保引用变化，触发MobX观察者更新
+          this.habits = [...this.habits, newHabit as Habit];
           this.loading = false;
         });
       }
@@ -67,7 +68,12 @@ class HabitStore {
       runInAction(() => {
         const index = this.habits.findIndex(h => h.id === id);
         if (index !== -1 && updatedHabit) {
-          this.habits[index] = updatedHabit as Habit;
+          // 使用新数组以确保引用变化，触发MobX观察者更新
+          this.habits = [
+            ...this.habits.slice(0, index),
+            updatedHabit as Habit,
+            ...this.habits.slice(index + 1)
+          ];
         }
         this.loading = false;
       });
@@ -87,7 +93,8 @@ class HabitStore {
     try {
       await remove('habits', id);
       runInAction(() => {
-        this.habits = this.habits.filter(h => h.id !== id);
+        // 创建新数组以确保引用变化，触发MobX观察者更新
+        this.habits = [...this.habits.filter(h => h.id !== id)];
         this.loading = false;
       });
     } catch (error) {

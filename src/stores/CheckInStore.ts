@@ -43,7 +43,8 @@ class CheckInStore {
       
       if (newCheckIn) {
         runInAction(() => {
-          this.checkIns.push(newCheckIn as CheckIn);
+          // 创建新数组以确保引用变化，触发MobX观察者更新
+          this.checkIns = [...this.checkIns, newCheckIn as CheckIn];
           this.loading = false;
         });
       }
@@ -67,7 +68,12 @@ class CheckInStore {
       runInAction(() => {
         const index = this.checkIns.findIndex(c => c.id === id);
         if (index !== -1 && updatedCheckIn) {
-          this.checkIns[index] = updatedCheckIn as CheckIn;
+          // 使用新数组以确保引用变化，触发MobX观察者更新
+          this.checkIns = [
+            ...this.checkIns.slice(0, index),
+            updatedCheckIn as CheckIn,
+            ...this.checkIns.slice(index + 1)
+          ];
         }
         this.loading = false;
       });
@@ -87,7 +93,8 @@ class CheckInStore {
     try {
       await remove('checkIns', id);
       runInAction(() => {
-        this.checkIns = this.checkIns.filter(c => c.id !== id);
+        // 创建新数组以确保引用变化，触发MobX观察者更新
+        this.checkIns = [...this.checkIns.filter(c => c.id !== id)];
         this.loading = false;
       });
     } catch (error) {
@@ -178,11 +185,15 @@ class CheckInStore {
       }
       
       if (filter.fromDate !== undefined) {
-        match = match && checkIn.date >= filter.fromDate;
+        const checkInDate = new Date(checkIn.date).getTime();
+        const fromDate = filter.fromDate.getTime();
+        match = match && checkInDate >= fromDate;
       }
       
       if (filter.toDate !== undefined) {
-        match = match && checkIn.date <= filter.toDate;
+        const checkInDate = new Date(checkIn.date).getTime();
+        const toDate = filter.toDate.getTime();
+        match = match && checkInDate <= toDate;
       }
       
       return match;

@@ -2,11 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
-import { viteSingleFile } from "vite-plugin-singlefile";
+// import { viteSingleFile } from "vite-plugin-singlefile";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), viteSingleFile()],
+  plugins: [react(), tailwindcss()],
   // 关键配置：禁用 CSS 拆分（确保 CSS 内联到 HTML）
   build: {
     cssCodeSplit: false,
@@ -16,7 +16,7 @@ export default defineConfig({
     assetsInlineLimit: 10 * 1024 * 1024,
   },
   // 单文件打包时 base 必须设为 '' 或 '.'（避免路径错误）
-  base: "",
+  base: "./",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -116,7 +116,7 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
               key={dayData.dateStr}
               title={`${dayData.dateStr}: ${dayData.checkIns.length}次打卡`}
               className={`
-                w-7 h-7 rounded-sm border flex items-center justify-center text-[10px]
+                w-7 h-7 rounded-sm border flex items-center justify-center text-[10px] font-medium
                 ${dayData.isToday ? 'border-primary border-2' : 'border-border'}
                 ${getColorClass(dayData.value)}
               `}
@@ -127,15 +127,15 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
         }
       }
       dayOfWeekRows.push(
-        <div key={`row-${dayOfWeek}`} className="flex gap-1">
+        <div key={`row-${dayOfWeek}`} className="flex gap-1 items-center">
           {rowCells}
         </div>
       );
     }
 
     return (
-      <div className="flex gap-1">
-        <div className="flex flex-col">
+      <div className="flex gap-2">
+        <div className="flex flex-col justify-between">
           {weekLabels}
         </div>
         <div className="flex flex-col gap-1">
@@ -150,11 +150,11 @@ const HabitHeatMap = observer(({ weeks = 7, className = "" }: HeatMapProps) => {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">习惯打卡热力图</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
+      <CardContent className="px-2 sm:px-4">
+        <div className="overflow-x-auto pb-2 flex justify-center">
           {generateHeatmapCells()}
         </div>
-        <div className="mt-3 flex items-center justify-center text-xs text-muted-foreground">
+        <div className="mt-4 flex items-center justify-center text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <span>少</span>
             <div className="flex gap-1">

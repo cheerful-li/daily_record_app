@@ -12,6 +12,15 @@ import { getAll } from "./database";
 // 固定的OSS路径
 const OSS_PATH = "llm_oss/test/daily_record_app.json";
 
+// 获取基于日期的OSS路径
+const getDateBasedOSSPath = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `llm_oss/test/daily_record_backup/${year}${month}${day}_daily_record_backup.json`;
+};
+
 // 获取API认证令牌
 const getAuthToken = (): string => {
   const token = localStorage.getItem("auth_token");
@@ -96,13 +105,17 @@ export const fetchCloudData = async () => {
 /**
  * 将本地数据上传到云端
  */
-export const uploadDataToCloud = async (): Promise<boolean> => {
+export const uploadDataToCloud = async (customPath?: string): Promise<boolean> => {
   try {
     const token = getAuthToken();
     const jsonData = await exportDataToJson();
+    
+    // 确定使用的路径
+    const ossPath = customPath || OSS_PATH;
+    const filename = ossPath.split('/').pop() || "daily_record_app.json";
 
     // 创建文件对象
-    const file = new File([jsonData], "daily_record_app.json", {
+    const file = new File([jsonData], filename, {
       type: "application/json",
     });
 
@@ -110,7 +123,7 @@ export const uploadDataToCloud = async (): Promise<boolean> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("token", token);
-    formData.append("ossPath", OSS_PATH);
+    formData.append("ossPath", ossPath);
 
     const response = await fetch(
       "https://hbmouz.faas.xiaoduoai.com/temp/oss/file_upload",
@@ -153,4 +166,41 @@ export const triggerCloudSync = () => {
       console.error("自动同步失败:", error);
     }
   }, 1000);
+};
+
+/**
+ * 将数据备份到按日期命名的文件中
+ * @returns 备份是否成功
+ */
+export const backupDataDaily = async (): Promise<boolean> => {
+  try {
+    // 获取基于当前日期的路径
+    const backupPath = getDateBasedOSSPath();
+    
+    // 上传数据到备份路径
+    const success = await uploadDataToCloud(backupPath);
+    
+    if (success) {
+      // 记录最后备份的日期
+      localStorage.setItem("last_backup_date", new Date().toISOString().split('T')[0]);
+      console.log("数据已成功备份到:", backupPath);
+      showSuccess("数据已成功备份");
+    }
+    
+    return success;
+  } catch (error) {
+    console.error("数据备份失败:", error);
+    showError("数据备份失败，请稍后再试");
+    return false;
+  }
+};
+
+/**
+ * 检查今天是否已经进行了备份
+ * @returns 今天是否已备份
+ */
+export const hasBackupToday = (): boolean => {
+  const lastBackupDate = localStorage.getItem("last_backup_date");
+  const today = new Date().toISOString().split('T')[0];
+  return lastBackupDate === today;
 };

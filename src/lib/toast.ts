@@ -2,21 +2,25 @@ import { toast } from "sonner";
 
 // Success toast
 export const showSuccess = (message: string) => {
+  console.log("showSuccess", message);
   toast.success(message);
 };
 
 // Error toast
 export const showError = (message: string) => {
+  console.error("showError", message);
   toast.error(message);
 };
 
 // Info toast
 export const showInfo = (message: string) => {
+  console.info("showInfo", message);
   toast.info(message);
 };
 
 // Warning toast
 export const showWarning = (message: string) => {
+  console.warn("showWarning", message);
   toast.warning(message);
 };
 

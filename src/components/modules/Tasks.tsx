@@ -132,14 +132,37 @@ const Tasks = observer(() => {
     //   );
     // }
 
-    // 按优先级和创建时间排序
+    // 改进的多级排序逻辑
     filtered.sort((a, b) => {
-      // 首先按优先级排序（high -> medium -> low）
+      // 1. 首先按状态排序: in-progress > pending > completed
+      const statusOrder = { 'in-progress': 0, 'pending': 1, 'completed': 2 };
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      if (statusDiff !== 0) return statusDiff;
+      
+      // 2. 对于未完成的任务，按截止日期从近到远排序
+      if (a.status !== 'completed' && b.status !== 'completed') {
+        // 如果两个任务都有截止日期，按日期比较
+        if (a.dueDate && b.dueDate) {
+          const dueDateA = new Date(a.dueDate).getTime();
+          const dueDateB = new Date(b.dueDate).getTime();
+          const dateDiff = dueDateA - dueDateB;
+          if (dateDiff !== 0) return dateDiff;
+        } 
+        // 有截止日期的排在前面
+        else if (a.dueDate && !b.dueDate) {
+          return -1;
+        } 
+        else if (!a.dueDate && b.dueDate) {
+          return 1;
+        }
+      }
+      
+      // 3. 然后按优先级排序（high -> medium -> low）
       const priorityOrder = { high: 0, medium: 1, low: 2 };
       const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
       if (priorityDiff !== 0) return priorityDiff;
       
-      // 然后按创建时间从新到旧排序
+      // 4. 最后按创建时间从新到旧排序
       const timeA = new Date(a.createdAt).getTime();
       const timeB = new Date(b.createdAt).getTime();
       return timeB - timeA; // 这里用 B-A 得到降序排列（从新到旧）
