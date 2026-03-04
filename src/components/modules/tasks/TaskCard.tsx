@@ -71,20 +71,20 @@ const TaskCard = observer(
     return (
       <Card className="w-full">
         <CardHeader className="pb-2">
-          <div className="flex  justify-between items-center">
-            <div className="flex shrink-0 items-center align-top gap-2">
-              <CardTitle className="text-lg break-all text-ellipsis overflow-hidden">
+          <div className="flex  justify-between items-center ">
+            <div className="flex  items-center align-top gap-2 flex-1 overflow-hidden">
+              <CardTitle className="text-lg  flex-1 whitespace-nowrap text-ellipsis overflow-hidden">
                 {task.title}
               </CardTitle>
               {getTypeIndicator(task.type)}
             </div>
-            <span
+            {/* <span
               className={`text-sm font-medium shrink-0 ${getPriorityColor(
                 task.priority
               )}`}
             >
               {formatTaskPriority(task.priority)}优先级
-            </span>
+            </span> */}
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <span
@@ -94,7 +94,6 @@ const TaskCard = observer(
             >
               {formatTaskStatus(task.status)}
             </span>
-            {/* 移除截止日期显示 */}
           </div>
         </CardHeader>
         <CardContent className="pb-2">
