@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
-import { Textarea } from '../../ui/textarea';
-import { Button } from '../../ui/button';
-import type { CheckIn, Habit } from '../../../services/database';
-import { formatCheckInStatus } from '../../../utils/formatters';
+import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog'
+import { Textarea } from '../../ui/textarea'
+import { Button } from '../../ui/button'
+import type { CheckIn, Habit } from '../../../services/database'
+import { formatCheckInStatus } from '../../../utils/formatters'
 
 interface CheckInFormProps {
   open: boolean;
@@ -15,13 +15,13 @@ interface CheckInFormProps {
 }
 
 const CheckInForm = observer(({ open, onClose, onSubmit, habit, status }: CheckInFormProps) => {
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     
     if (!habit?.id) {
-      return;
+      return
     }
     
     onSubmit({
@@ -29,18 +29,18 @@ const CheckInForm = observer(({ open, onClose, onSubmit, habit, status }: CheckI
       date: new Date(),
       status,
       note,
-    });
+    })
     
-    setNote('');
-    onClose();
-  };
+    setNote('')
+    onClose()
+  }
 
   if (!habit) {
-    return null;
+    return null
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -68,7 +68,7 @@ const CheckInForm = observer(({ open, onClose, onSubmit, habit, status }: CheckI
         </form>
       </DialogContent>
     </Dialog>
-  );
-});
+  )
+})
 
-export default CheckInForm;
+export default CheckInForm

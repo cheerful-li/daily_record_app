@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "bun vite --host",
     "build": "bun vite build",
-    "lint": "bun eslint .",
-    "typecheck": "bun tsc --noEmit",
+    "lint": "bun eslint . --fix",
+    "typecheck": "npx tsc --noEmit -p ./tsconfig.app.json",
     "preview": "bun vite preview"
   },
   "dependencies": {

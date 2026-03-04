@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { LockKeyhole } from "lucide-react";
-import { verifyPassword, generateAndStoreToken } from "../../utils/auth";
-import { showSuccess, showError } from "../../lib/toast";
+} from "../ui/dialog"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
+import { LockKeyhole } from "lucide-react"
+import { verifyPassword, generateAndStoreToken } from "../../utils/auth"
+import { showSuccess, showError } from "../../lib/toast"
 
 interface PasswordDialogProps {
   open: boolean;
@@ -18,34 +18,34 @@ interface PasswordDialogProps {
 }
 
 const PasswordDialog = ({ open, onAuthenticated }: PasswordDialogProps) => {
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
     try {
       // 验证密码
       if (verifyPassword(password)) {
         // 生成并存储令牌
-        generateAndStoreToken(password);
-        showSuccess("验证成功！");
-        onAuthenticated();
+        generateAndStoreToken(password)
+        showSuccess("验证成功！")
+        onAuthenticated()
       } else {
-        setError("密码不正确，请重试");
-        showError("密码验证失败");
+        setError("密码不正确，请重试")
+        showError("密码验证失败")
       }
     } catch (err) {
-      console.error("验证过程中发生错误:", err);
-      setError("验证过程中发生错误，请重试");
-      showError("验证过程中发生错误");
+      console.error("验证过程中发生错误:", err)
+      setError("验证过程中发生错误，请重试")
+      showError("验证过程中发生错误")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog open={open}>
@@ -93,7 +93,7 @@ const PasswordDialog = ({ open, onAuthenticated }: PasswordDialogProps) => {
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default PasswordDialog;
+export default PasswordDialog

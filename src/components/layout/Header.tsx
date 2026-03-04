@@ -1,9 +1,9 @@
-import { observer } from 'mobx-react-lite';
-import { Link, useLocation } from 'react-router-dom';
-import { useUIStore } from '../../stores/StoreContext';
-import { Button } from '../ui/button';
-import { MoonIcon, SunIcon, CheckCircledIcon, ClockIcon, CalendarIcon, PersonIcon, LightningBoltIcon, PieChartIcon } from '@radix-ui/react-icons';
-import { cn } from '../../lib/utils';
+import { observer } from 'mobx-react-lite'
+import { Link, useLocation } from 'react-router-dom'
+import { useUIStore } from '../../stores/StoreContext'
+import { Button } from '../ui/button'
+import { MoonIcon, SunIcon, CheckCircledIcon, ClockIcon, CalendarIcon, PersonIcon, LightningBoltIcon, PieChartIcon } from '@radix-ui/react-icons'
+import { cn } from '../../lib/utils'
 
 interface HeaderProps {
   className?: string;
@@ -16,15 +16,15 @@ const navItems = [
   { path: '/app/relationships', id: 'relationships', label: '社交关系', icon: PersonIcon },
   { path: '/app/ideas', id: 'ideas', label: '灵感想法', icon: LightningBoltIcon },
   { path: '/app/statistics', id: 'statistics', label: '统计数据', icon: PieChartIcon },
-];
+]
 
 const Header = observer(({ className }: HeaderProps) => {
-  const uiStore = useUIStore();
-  const location = useLocation();
+  const uiStore = useUIStore()
+  const location = useLocation()
 
   const toggleTheme = () => {
-    uiStore.toggleTheme();
-  };
+    uiStore.toggleTheme()
+  }
 
   return (
     <header className={cn("sticky top-0 z-30 w-full border-b bg-gradient-to-r from-background to-background/90 backdrop-blur-md shadow-sm", className)}>
@@ -35,8 +35,8 @@ const Header = observer(({ className }: HeaderProps) => {
 
         <nav className="flex-1 hidden md:flex items-center gap-1">
           {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+            const Icon = item.icon
+            const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
             return (
               <Link
                 key={item.id}
@@ -51,7 +51,7 @@ const Header = observer(({ className }: HeaderProps) => {
                 <Icon className="h-4 w-4" />
                 {item.label}
               </Link>
-            );
+            )
           })}
         </nav>
 
@@ -64,7 +64,7 @@ const Header = observer(({ className }: HeaderProps) => {
         </Button>
       </div>
     </header>
-  );
-});
+  )
+})
 
-export default Header;
+export default Header

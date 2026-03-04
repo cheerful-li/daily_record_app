@@ -1,187 +1,200 @@
-import { makeAutoObservable, runInAction } from 'mobx';
-import type { LifeMoment } from '../services/database';
-import { getById, queryByIndex } from '../services/database';
-import { add, update, remove, getAll } from '../services/enhancedDatabase';
+import { makeAutoObservable, runInAction } from "mobx"
+import type { LifeMoment } from "../services/database"
+import { getById, queryByIndex } from "../services/database"
+import { add, update, remove, getAll } from "../services/enhancedDatabase"
 
 class LifeMomentStore {
-  lifeMoments: LifeMoment[] = [];
-  loading = false;
-  error: Error | null = null;
+  lifeMoments: LifeMoment[] = []
+  loading = false
+  error: Error | null = null
 
   constructor() {
-    makeAutoObservable(this);
-    this.loadLifeMoments();
+    makeAutoObservable(this)
+    this.loadLifeMoments()
   }
 
   // Load all life moments
   async loadLifeMoments() {
-    this.loading = true;
-    this.error = null;
+    this.loading = true
+    this.error = null
 
     try {
-      const lifeMoments = await getAll('lifeMoments');
+      const lifeMoments = await getAll("lifeMoments")
       runInAction(() => {
-        this.lifeMoments = lifeMoments;
-        this.loading = false;
-      });
+        this.lifeMoments = lifeMoments
+        this.loading = false
+      })
     } catch (error) {
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+      })
     }
   }
 
   // Add a new life moment
-  async addLifeMoment(lifeMoment: Omit<LifeMoment, 'id' | 'createdAt' | 'updatedAt'>) {
-    this.loading = true;
-    this.error = null;
+  async addLifeMoment(
+    lifeMoment: Omit<LifeMoment, "id" | "createdAt" | "updatedAt">
+  ) {
+    this.loading = true
+    this.error = null
 
     try {
-      const id = await add('lifeMoments', lifeMoment);
-      const newLifeMoment = await getById('lifeMoments', id);
-      
+      const id = await add("lifeMoments", lifeMoment)
+      const newLifeMoment = await getById("lifeMoments", id)
+
       if (newLifeMoment) {
         runInAction(() => {
-          this.lifeMoments.push(newLifeMoment as LifeMoment);
-          this.loading = false;
-        });
+          this.lifeMoments.push(newLifeMoment as LifeMoment)
+          this.loading = false
+        })
       }
     } catch (error) {
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+      })
     }
   }
 
   // Update an existing life moment
   async updateLifeMoment(id: number, lifeMomentData: Partial<LifeMoment>) {
-    this.loading = true;
-    this.error = null;
+    this.loading = true
+    this.error = null
 
     try {
-      console.log('在LifeMomentStore中更新生活点滴:', { id, data: lifeMomentData });
+      console.log("在LifeMomentStore中更新生活点滴:", {
+        id,
+        data: lifeMomentData,
+      })
 
       // 首先获取现有数据
-      const existingLifeMoment = await getById('lifeMoments', id);
+      const existingLifeMoment = await getById("lifeMoments", id)
       if (!existingLifeMoment) {
-        throw new Error(`未找到ID为${id}的生活点滴记录`);
+        throw new Error(`未找到ID为${id}的生活点滴记录`)
       }
 
       // 处理tags数组，确保是简单字符串数组
-      let processedData: Partial<LifeMoment> = { ...lifeMomentData };
+      const processedData: Partial<LifeMoment> = { ...lifeMomentData }
       if (lifeMomentData.tags) {
         // 确保标签是简单的字符串数组
-        processedData.tags = lifeMomentData.tags.map(tag => String(tag));
+        processedData.tags = lifeMomentData.tags.map((tag) => String(tag))
       }
-      
+
       // 处理日期字段
       if (lifeMomentData.date) {
         // 确保日期是有效的Date对象
         try {
-          const date = new Date(lifeMomentData.date);
+          const date = new Date(lifeMomentData.date)
           if (!isNaN(date.getTime())) {
-            processedData.date = date;
+            processedData.date = date
           } else {
             // 如果日期无效，使用当前日期
-            processedData.date = new Date();
-            console.warn('使用了无效的日期，已替换为当前日期');
+            processedData.date = new Date()
+            console.warn("使用了无效的日期，已替换为当前日期")
           }
         } catch (error) {
           // 如果转换日期出错，使用当前日期
-          processedData.date = new Date();
-          console.error('处理日期时发生错误，已替换为当前日期:', error);
+          processedData.date = new Date()
+          console.error("处理日期时发生错误，已替换为当前日期:", error)
         }
       }
-      
-      // 移除所有可能导致序列化错误的属性
-      if (processedData.attachments && Array.isArray(processedData.attachments)) {
-        processedData.attachments = processedData.attachments.map(att => String(att));
-      }
-      
-      console.log('处理后的数据:', processedData);
 
-      await update('lifeMoments', id, processedData);
-      const updatedLifeMoment = await getById('lifeMoments', id);
-      console.log('更新后读取到的生活点滴:', updatedLifeMoment);
-      
+      // 移除所有可能导致序列化错误的属性
+      if (
+        processedData.attachments &&
+        Array.isArray(processedData.attachments)
+      ) {
+        processedData.attachments = processedData.attachments.map((att) =>
+          String(att)
+        )
+      }
+
+      console.log("处理后的数据:", processedData)
+
+      await update("lifeMoments", id, processedData)
+      const updatedLifeMoment = await getById("lifeMoments", id)
+      console.log("更新后读取到的生活点滴:", updatedLifeMoment)
+
       runInAction(() => {
-        const index = this.lifeMoments.findIndex(l => l.id === id);
+        const index = this.lifeMoments.findIndex((l) => l.id === id)
         if (index !== -1 && updatedLifeMoment) {
-          this.lifeMoments[index] = updatedLifeMoment as LifeMoment;
-          console.log('已更新内存中的生活点滴数据');
+          this.lifeMoments[index] = updatedLifeMoment as LifeMoment
+          console.log("已更新内存中的生活点滴数据")
         } else {
-          console.error('找不到要更新的生活点滴或更新后的数据为空', { index, updatedLifeMoment });
+          console.error("找不到要更新的生活点滴或更新后的数据为空", {
+            index,
+            updatedLifeMoment,
+          })
         }
-        this.loading = false;
-      });
+        this.loading = false
+      })
     } catch (error) {
-      console.error('更新生活点滴时发生错误:', error);
+      console.error("更新生活点滴时发生错误:", error)
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+      })
     }
   }
 
   // Delete a life moment
   async deleteLifeMoment(id: number) {
-    this.loading = true;
-    this.error = null;
+    this.loading = true
+    this.error = null
 
     try {
-      await remove('lifeMoments', id);
+      await remove("lifeMoments", id)
       runInAction(() => {
-        this.lifeMoments = this.lifeMoments.filter(l => l.id !== id);
-        this.loading = false;
-      });
+        this.lifeMoments = this.lifeMoments.filter((l) => l.id !== id)
+        this.loading = false
+      })
     } catch (error) {
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+      })
     }
   }
 
   // Get life moments by date
   async getLifeMomentsByDate(date: Date) {
-    this.loading = true;
-    this.error = null;
+    this.loading = true
+    this.error = null
 
     try {
       // Note: This is a simplification and might need adjustment for date comparison
-      const lifeMoments = await queryByIndex('lifeMoments', 'by-date', date);
+      const lifeMoments = await queryByIndex("lifeMoments", "by-date", date)
       runInAction(() => {
-        this.loading = false;
-        return lifeMoments;
-      });
+        this.loading = false
+        return lifeMoments
+      })
     } catch (error) {
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-        return [];
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+        return []
+      })
     }
   }
 
   // Get life moments by tag
   async getLifeMomentsByTag(tag: string) {
-    this.loading = true;
-    this.error = null;
+    this.loading = true
+    this.error = null
 
     try {
-      const lifeMoments = await queryByIndex('lifeMoments', 'by-tags', tag);
+      const lifeMoments = await queryByIndex("lifeMoments", "by-tags", [tag])
       runInAction(() => {
-        this.loading = false;
-        return lifeMoments;
-      });
+        this.loading = false
+        return lifeMoments
+      })
     } catch (error) {
       runInAction(() => {
-        this.error = error instanceof Error ? error : new Error(String(error));
-        this.loading = false;
-        return [];
-      });
+        this.error = error instanceof Error ? error : new Error(String(error))
+        this.loading = false
+        return []
+      })
     }
   }
 
@@ -192,28 +205,31 @@ class LifeMomentStore {
     fromDate?: Date;
     toDate?: Date;
   }) {
-    return this.lifeMoments.filter(lifeMoment => {
-      let match = true;
-      
-      if (filter.title !== undefined && filter.title.trim() !== '') {
-        match = match && lifeMoment.title.toLowerCase().includes(filter.title.toLowerCase());
+    return this.lifeMoments.filter((lifeMoment) => {
+      let match = true
+
+      if (filter.title !== undefined && filter.title.trim() !== "") {
+        match =
+          match &&
+          lifeMoment.title.toLowerCase().includes(filter.title.toLowerCase())
       }
-      
+
       if (filter.tags !== undefined && filter.tags.length > 0) {
-        match = match && filter.tags.some(tag => lifeMoment.tags.includes(tag));
+        match =
+          match && filter.tags.some((tag) => lifeMoment.tags.includes(tag))
       }
-      
+
       if (filter.fromDate !== undefined) {
-        match = match && lifeMoment.date >= filter.fromDate;
+        match = match && lifeMoment.date >= filter.fromDate
       }
-      
+
       if (filter.toDate !== undefined) {
-        match = match && lifeMoment.date <= filter.toDate;
+        match = match && lifeMoment.date <= filter.toDate
       }
-      
-      return match;
-    });
+
+      return match
+    })
   }
 }
 
-export default LifeMomentStore;
+export default LifeMomentStore

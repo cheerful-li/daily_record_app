@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
+import { useState, useEffect } from "react"
+import { observer } from "mobx-react-lite"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
-} from "../../ui/dialog";
-import { Input } from "../../ui/input";
-import { Textarea } from "../../ui/textarea";
-import { Button } from "../../ui/button";
-import type { LifeMoment } from "../../../services/database";
+} from "../../ui/dialog"
+import { Input } from "../../ui/input"
+import { Textarea } from "../../ui/textarea"
+import { Button } from "../../ui/button"
+import type { LifeMoment } from "../../../services/database"
 
 interface MomentFormProps {
   open: boolean;
@@ -33,49 +32,49 @@ const MomentForm = observer(
     isEditing = false,
     availableTags = [],
   }: MomentFormProps) => {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [date, setDate] = useState<Date>(new Date());
-    const [tagsInput, setTagsInput] = useState("");
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
+    const [date, setDate] = useState<Date>(new Date())
+    const [tagsInput, setTagsInput] = useState("")
+    const [selectedTags, setSelectedTags] = useState<string[]>([])
 
     // Reset form when dialog opens with initialData
     useEffect(() => {
       if (initialData) {
-        setTitle(initialData.title);
-        setDescription(initialData.description);
-        setDate(new Date(initialData.date));
-        setTagsInput(initialData.tags.join(", "));
-        setSelectedTags(initialData.tags);
+        setTitle(initialData.title)
+        setDescription(initialData.description)
+        setDate(new Date(initialData.date))
+        setTagsInput(initialData.tags.join(", "))
+        setSelectedTags(initialData.tags)
       } else {
         // Reset form for a new moment
-        setTitle("");
-        setDescription("");
-        setDate(new Date());
-        setTagsInput("");
-        setSelectedTags([]);
+        setTitle("")
+        setDescription("")
+        setDate(new Date())
+        setTagsInput("")
+        setSelectedTags([])
       }
-    }, [initialData, open]);
+    }, [initialData, open])
 
     const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
 
       // Process tags: split by comma, trim whitespace, and remove empty entries
       const tags = tagsInput
         .split(",")
         .map((tag) => tag.trim())
-        .filter((tag) => tag !== "");
+        .filter((tag) => tag !== "")
 
       // Include selected tags, ensuring no duplicates and only strings
       // 先合并标签，然后去重，确保只有字符串
-      const uniqueTags = Array.from(new Set([...tags, ...selectedTags]));
-      const allTags = uniqueTags.map(tag => String(tag)); // 确保所有标签都是字符串类型
+      const uniqueTags = Array.from(new Set([...tags, ...selectedTags]))
+      const allTags = uniqueTags.map(tag => String(tag)) // 确保所有标签都是字符串类型
 
       // 处理日期，确保是有效的Date对象
-      const safeDate = new Date(date.getTime());
+      const safeDate = new Date(date.getTime())
       
       // 确保附件是简单数组
-      const safeAttachments = (initialData?.attachments || []).map(att => String(att));
+      const safeAttachments = (initialData?.attachments || []).map(att => String(att))
       
       // 准备安全的数据对象
       const safeData = {
@@ -84,37 +83,37 @@ const MomentForm = observer(
         date: safeDate,
         tags: allTags,
         attachments: safeAttachments,
-      };
+      }
       
       // 提交处理后的安全数据
-      onSubmit(safeData);
+      onSubmit(safeData)
       
       // 调试输出
-      console.log('提交的安全数据:', safeData);
+      console.log('提交的安全数据:', safeData)
 
-      onClose();
-    };
+      onClose()
+    }
 
     const handleTagClick = (tag: string) => {
       // Toggle tag selection
       if (selectedTags.includes(tag)) {
-        setSelectedTags(selectedTags.filter((t) => t !== tag));
+        setSelectedTags(selectedTags.filter((t) => t !== tag))
       } else {
-        setSelectedTags([...selectedTags, tag]);
+        setSelectedTags([...selectedTags, tag])
 
         // Also remove from tagsInput if it's there
         const currentTags = tagsInput
           .split(",")
           .map((t) => t.trim())
-          .filter((t) => t !== "" && t !== tag);
-        setTagsInput(currentTags.join(", "));
+          .filter((t) => t !== "" && t !== tag)
+        setTagsInput(currentTags.join(", "))
       }
-    };
+    }
 
     // Format date for input
     const formatDateForInput = (date: Date) => {
-      return date.toISOString().split("T")[0];
-    };
+      return date.toISOString().split("T")[0]
+    }
 
     return (
       <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -206,8 +205,8 @@ const MomentForm = observer(
           </form>
         </DialogContent>
       </Dialog>
-    );
+    )
   }
-);
+)
 
-export default MomentForm;
+export default MomentForm

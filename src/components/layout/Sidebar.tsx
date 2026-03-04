@@ -1,7 +1,7 @@
-import { observer } from 'mobx-react-lite';
-import { useUIStore } from '../../stores/StoreContext';
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
+import { observer } from 'mobx-react-lite'
+import { useUIStore } from '../../stores/StoreContext'
+import { cn } from '../../lib/utils'
+import { Button } from '../ui/button'
 import {
   ClockIcon,
   CalendarIcon,
@@ -9,7 +9,7 @@ import {
   PersonIcon,
   LightningBoltIcon,
   PieChartIcon,
-} from '@radix-ui/react-icons';
+} from '@radix-ui/react-icons'
 
 type NavItem = {
   id: string;
@@ -48,14 +48,14 @@ const navItems: NavItem[] = [
     label: '统计数据',
     icon: <PieChartIcon className="h-5 w-5" />,
   },
-];
+]
 
 const Sidebar = observer(() => {
-  const uiStore = useUIStore();
+  const uiStore = useUIStore()
 
   const handleNavClick = (module: string) => {
-    uiStore.setActiveModule(module);
-  };
+    uiStore.setActiveModule(module)
+  }
 
   return (
     <aside
@@ -84,7 +84,7 @@ const Sidebar = observer(() => {
         ))}
       </nav>
     </aside>
-  );
-});
+  )
+})
 
-export default Sidebar;
+export default Sidebar

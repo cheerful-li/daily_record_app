@@ -1,6 +1,6 @@
-import { observer } from 'mobx-react-lite';
-import type { Relationship } from '../../../services/database';
-import RelationshipCard from './RelationshipCard';
+import { observer } from 'mobx-react-lite'
+import type { Relationship } from '../../../services/database'
+import RelationshipCard from './RelationshipCard'
 
 interface RelationshipsListProps {
   relationships: Relationship[];
@@ -25,7 +25,7 @@ const RelationshipsList = observer(({
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -40,7 +40,7 @@ const RelationshipsList = observer(({
         />
       ))}
     </div>
-  );
-});
+  )
+})
 
-export default RelationshipsList;
+export default RelationshipsList

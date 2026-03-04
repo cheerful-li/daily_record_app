@@ -1,9 +1,9 @@
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { CalendarIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
-import type { LifeMoment } from '../../../services/database';
-import { formatDate } from '../../../utils/formatters';
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../ui/card'
+import { Button } from '../../ui/button'
+import { CalendarIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
+import type { LifeMoment } from '../../../services/database'
+import { formatDate } from '../../../utils/formatters'
 
 interface MomentCardProps {
   moment: LifeMoment;
@@ -14,9 +14,9 @@ interface MomentCardProps {
 const MomentCard = observer(({ moment, onEdit, onDelete }: MomentCardProps) => {
   // Function to truncate description if it's too long
   const truncateDescription = (text: string, maxLength = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
+  }
 
   return (
     <Card className="w-full hover:shadow-md transition-shadow">
@@ -50,8 +50,8 @@ const MomentCard = observer(({ moment, onEdit, onDelete }: MomentCardProps) => {
             variant="ghost" 
             size="sm"
             onClick={(e) => {
-              e.stopPropagation();
-              onEdit(moment);
+              e.stopPropagation()
+              onEdit(moment)
             }}
           >
             <Pencil1Icon className="h-4 w-4 mr-1" />
@@ -62,8 +62,8 @@ const MomentCard = observer(({ moment, onEdit, onDelete }: MomentCardProps) => {
             size="sm"
             className="text-red-500 hover:text-red-700"
             onClick={(e) => {
-              e.stopPropagation();
-              onDelete(moment.id);
+              e.stopPropagation()
+              onDelete(moment.id)
             }}
           >
             <TrashIcon className="h-4 w-4 mr-1" />
@@ -72,7 +72,7 @@ const MomentCard = observer(({ moment, onEdit, onDelete }: MomentCardProps) => {
         </div>
       </CardFooter>
     </Card>
-  );
-});
+  )
+})
 
-export default MomentCard;
+export default MomentCard

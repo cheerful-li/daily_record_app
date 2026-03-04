@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useRelationshipStore } from '../../stores/StoreContext';
-import { Button } from '../ui/button';
-import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons';
-import type { Relationship } from '../../services/database';
-import RelationshipsList from './relationships/RelationshipsList';
-import RelationshipDetail from './relationships/RelationshipDetail';
-import RelationshipForm from './relationships/RelationshipForm';
-import ContactForm from './relationships/ContactForm';
-import RelationshipFilter from './relationships/RelationshipFilter';
+import { useState, useEffect, useCallback } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useRelationshipStore } from '../../stores/StoreContext'
+import { Button } from '../ui/button'
+import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons'
+import type { Relationship } from '../../services/database'
+import RelationshipsList from './relationships/RelationshipsList'
+import RelationshipDetail from './relationships/RelationshipDetail'
+import RelationshipForm from './relationships/RelationshipForm'
+import ContactForm from './relationships/ContactForm'
+import RelationshipFilter from './relationships/RelationshipFilter'
 
 interface FilterOptions {
   searchText: string;
@@ -17,73 +17,132 @@ interface FilterOptions {
 }
 
 const Relationships = observer(() => {
-  const relationshipStore = useRelationshipStore();
+  const relationshipStore = useRelationshipStore()
   
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
-  const [selectedRelationship, setSelectedRelationship] = useState<Relationship | undefined>();
-  const [filteredRelationships, setFilteredRelationships] = useState<Relationship[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
+  const [selectedRelationship, setSelectedRelationship] = useState<Relationship | undefined>()
+  const [filteredRelationships, setFilteredRelationships] = useState<Relationship[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: '',
     category: 'all',
     contactStatus: 'all'
-  });
-  const [showFilters, setShowFilters] = useState(false); // 控制筛选面板的显示/隐藏
+  })
+  const [showFilters, setShowFilters] = useState(false) // 控制筛选面板的显示/隐藏
 
   useEffect(() => {
-    relationshipStore.loadRelationships();
-  }, [relationshipStore]);
-
-  // Update filtered relationships when store data changes or filter changes
-  useEffect(() => {
-    applyFilters();
-  }, [relationshipStore.relationships, filterOptions]);
+    relationshipStore.loadRelationships()
+  }, [relationshipStore])
 
   // Extract unique categories from relationships
   useEffect(() => {
-    const uniqueCategories = new Set<string>();
+    const uniqueCategories = new Set<string>()
     relationshipStore.relationships.forEach(relationship => {
-      uniqueCategories.add(relationship.category);
-    });
-    setCategories(Array.from(uniqueCategories));
-  }, [relationshipStore.relationships]);
+      uniqueCategories.add(relationship.category)
+    })
+    setCategories(Array.from(uniqueCategories))
+  }, [relationshipStore.relationships])
+
+  const applyFilters = useCallback(() => {
+    let filtered = [...relationshipStore.relationships]
+    const today = new Date()
+    
+    // Filter by search text (in name or notes)
+    if (filterOptions.searchText) {
+      const searchLower = filterOptions.searchText.toLowerCase()
+      filtered = filtered.filter(
+        relationship =>
+          relationship.name.toLowerCase().includes(searchLower) ||
+          (relationship.notes && relationship.notes.toLowerCase().includes(searchLower))
+      )
+    }
+
+    // Filter by category
+    if (filterOptions.category !== 'all') {
+      filtered = filtered.filter(relationship => relationship.category === filterOptions.category)
+    }
+
+    // Filter by contact status
+    if (filterOptions.contactStatus !== 'all') {
+      switch (filterOptions.contactStatus) {
+        case 'overdue':
+          filtered = filtered.filter(relationship => 
+            relationship.nextContact && new Date(relationship.nextContact) < today
+          )
+          break
+        case 'upcoming':
+          filtered = filtered.filter(relationship => {
+            if (!relationship.nextContact) return false
+            
+            const nextContact = new Date(relationship.nextContact)
+            const weekLater = new Date(today)
+            weekLater.setDate(today.getDate() + 7)
+            
+            return nextContact >= today && nextContact <= weekLater
+          })
+          break
+        case 'no-date':
+          filtered = filtered.filter(relationship => !relationship.nextContact)
+          break
+      }
+    }
+
+    // Sort by next contact date (due first) then by name
+    filtered.sort((a, b) => {
+      if (a.nextContact && b.nextContact) {
+        // Both have next contact dates - sort by date (sooner first)
+        return new Date(a.nextContact).getTime() - new Date(b.nextContact).getTime()
+      } else if (a.nextContact) {
+        return -1 // a has next contact date, b doesn't
+      } else if (b.nextContact) {
+        return 1 // b has next contact date, a doesn't
+      } else {
+        // Neither has next contact date - sort by name
+        return a.name.localeCompare(b.name)
+      }
+    })
+    
+    setFilteredRelationships(filtered)
+  }, [relationshipStore.relationships, filterOptions])
+
+  // Update filtered relationships when store data changes or filter changes
+  useEffect(() => {
+    applyFilters()
+  }, [relationshipStore.relationships, filterOptions, applyFilters])
 
   const handleAddRelationship = async (relationship: Omit<Relationship, 'id' | 'createdAt' | 'updatedAt'>) => {
-    await relationshipStore.addRelationship(relationship);
-  };
+    await relationshipStore.addRelationship(relationship)
+  }
 
   const handleEditRelationship = async (relationship: Omit<Relationship, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (selectedRelationship?.id) {
-      await relationshipStore.updateRelationship(selectedRelationship.id, relationship);
+      await relationshipStore.updateRelationship(selectedRelationship.id, relationship)
     }
-  };
+  }
 
   const handleDeleteRelationship = async (relationshipId: number | undefined) => {
     if (relationshipId) {
       if (confirm('确定要删除这个联系人吗？')) {
-        await relationshipStore.deleteRelationship(relationshipId);
+        await relationshipStore.deleteRelationship(relationshipId)
         if (selectedRelationship?.id === relationshipId) {
-          setSelectedRelationship(undefined);
+          setSelectedRelationship(undefined)
         }
       }
     }
-  };
+  }
 
   const handleEditClick = (relationship: Relationship) => {
-    setSelectedRelationship(relationship);
-    setIsEditDialogOpen(true);
-  };
+    setSelectedRelationship(relationship)
+    setIsEditDialogOpen(true)
+  }
 
-  const handleSelectRelationship = (relationship: Relationship) => {
-    setSelectedRelationship(relationship);
-  };
 
   const handleUpdateContact = (relationship: Relationship) => {
-    setSelectedRelationship(relationship);
-    setIsContactDialogOpen(true);
-  };
+    setSelectedRelationship(relationship)
+    setIsContactDialogOpen(true)
+  }
 
   const handleContactSubmit = async (
     relationshipId: number | undefined,
@@ -94,98 +153,36 @@ const Relationships = observer(() => {
     if (relationshipId && selectedRelationship) {
       const updatedData: Partial<Relationship> = {
         lastContact,
-      };
+      }
       
       if (nextContact) {
-        updatedData.nextContact = nextContact;
+        updatedData.nextContact = nextContact
       }
       
       // Append new notes to existing notes
       if (notes) {
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-        const newNote = `[${formattedDate}] ${notes}\n\n`;
+        const currentDate = new Date()
+        const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`
+        const newNote = `[${formattedDate}] ${notes}\n\n`
         
         if (selectedRelationship.notes) {
-          updatedData.notes = newNote + selectedRelationship.notes;
+          updatedData.notes = newNote + selectedRelationship.notes
         } else {
-          updatedData.notes = newNote;
+          updatedData.notes = newNote
         }
       }
       
-      await relationshipStore.updateRelationship(relationshipId, updatedData);
+      await relationshipStore.updateRelationship(relationshipId, updatedData)
     }
-  };
+  }
 
   const handleFilterChange = (options: FilterOptions) => {
-    setFilterOptions(options);
-  };
+    setFilterOptions(options)
+  }
   
   const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
-
-  const applyFilters = () => {
-    let filtered = [...relationshipStore.relationships];
-    const today = new Date();
-    
-    // Filter by search text (in name or notes)
-    if (filterOptions.searchText) {
-      const searchLower = filterOptions.searchText.toLowerCase();
-      filtered = filtered.filter(
-        relationship =>
-          relationship.name.toLowerCase().includes(searchLower) ||
-          (relationship.notes && relationship.notes.toLowerCase().includes(searchLower))
-      );
-    }
-
-    // Filter by category
-    if (filterOptions.category !== 'all') {
-      filtered = filtered.filter(relationship => relationship.category === filterOptions.category);
-    }
-
-    // Filter by contact status
-    if (filterOptions.contactStatus !== 'all') {
-      switch (filterOptions.contactStatus) {
-        case 'overdue':
-          filtered = filtered.filter(relationship => 
-            relationship.nextContact && new Date(relationship.nextContact) < today
-          );
-          break;
-        case 'upcoming':
-          filtered = filtered.filter(relationship => {
-            if (!relationship.nextContact) return false;
-            
-            const nextContact = new Date(relationship.nextContact);
-            const weekLater = new Date(today);
-            weekLater.setDate(today.getDate() + 7);
-            
-            return nextContact >= today && nextContact <= weekLater;
-          });
-          break;
-        case 'no-date':
-          filtered = filtered.filter(relationship => !relationship.nextContact);
-          break;
-      }
-    }
-
-    // Sort by next contact date (due first) then by name
-    filtered.sort((a, b) => {
-      if (a.nextContact && b.nextContact) {
-        // Both have next contact dates - sort by date (sooner first)
-        return new Date(a.nextContact).getTime() - new Date(b.nextContact).getTime();
-      } else if (a.nextContact) {
-        return -1; // a has next contact date, b doesn't
-      } else if (b.nextContact) {
-        return 1; // b has next contact date, a doesn't
-      } else {
-        // Neither has next contact date - sort by name
-        return a.name.localeCompare(b.name);
-      }
-    });
-    
-    setFilteredRelationships(filtered);
-  };
+    setShowFilters(!showFilters)
+  }
 
   return (
     <div className="container mx-auto pb-20 md:pb-0">
@@ -276,7 +273,7 @@ const Relationships = observer(() => {
         relationship={selectedRelationship}
       />
     </div>
-  );
-});
+  )
+})
 
-export default Relationships;
+export default Relationships

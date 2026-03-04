@@ -1,64 +1,64 @@
-import { observer } from 'mobx-react-lite';
-import { useState, useEffect } from 'react';
-import type { CheckIn, Habit } from '../../../services/database';
-import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card';
-import { formatSimpleDate, formatCheckInStatus } from '../../../utils/formatters';
-import { useHabitStore, useCheckInStore } from '../../../stores/StoreContext';
+import { observer } from 'mobx-react-lite'
+import { useState, useEffect } from 'react'
+import type { CheckIn, Habit } from '../../../services/database'
+import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card'
+import { formatSimpleDate, formatCheckInStatus } from '../../../utils/formatters'
+import { useHabitStore, useCheckInStore } from '../../../stores/StoreContext'
 
 interface CheckInHistoryProps {
   habitId?: number;
 }
 
 const CheckInHistory = observer(({ habitId }: CheckInHistoryProps) => {
-  const [history, setHistory] = useState<CheckIn[]>([]);
-  const [habit, setHabit] = useState<Habit | null>(null);
-  const habitStore = useHabitStore();
-  const checkInStore = useCheckInStore();
-  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<CheckIn[]>([])
+  const [habit, setHabit] = useState<Habit | null>(null)
+  const habitStore = useHabitStore()
+  const checkInStore = useCheckInStore()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const loadHistory = async () => {
-      if (!habitId) return;
+      if (!habitId) return
       
-      setLoading(true);
+      setLoading(true)
       try {
         // Get the habit
-        const habitData = await habitStore.habits.find(h => h.id === habitId);
+        const habitData = await habitStore.habits.find(h => h.id === habitId)
         if (habitData) {
-          setHabit(habitData);
+          setHabit(habitData)
         }
         
         // Get the check-ins for this habit
-        const checkIns = checkInStore.checkIns.filter(c => c.habitId === habitId);
+        const checkIns = checkInStore.checkIns.filter(c => c.habitId === habitId)
         
         // Sort by date, most recent first
         const sortedCheckIns = [...checkIns].sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
+        )
         
-        setHistory(sortedCheckIns);
+        setHistory(sortedCheckIns)
       } catch (error) {
-        console.error('Error loading check-in history:', error);
+        console.error('Error loading check-in history:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
     
-    loadHistory();
-  }, [habitId, habitStore.habits, checkInStore.checkIns]);
+    loadHistory()
+  }, [habitId, habitStore.habits, checkInStore.checkIns])
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'text-green-500';
+        return 'text-green-500'
       case 'half-completed':
-        return 'text-yellow-500';
+        return 'text-yellow-500'
       case 'skipped':
-        return 'text-red-500';
+        return 'text-red-500'
       default:
-        return 'text-gray-500';
+        return 'text-gray-500'
     }
-  };
+  }
 
   if (!habitId || !habit) {
     return (
@@ -70,7 +70,7 @@ const CheckInHistory = observer(({ habitId }: CheckInHistoryProps) => {
           <p className="text-muted-foreground">选择一个习惯以查看其打卡历史</p>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -103,7 +103,7 @@ const CheckInHistory = observer(({ habitId }: CheckInHistoryProps) => {
         )}
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default CheckInHistory;
+export default CheckInHistory

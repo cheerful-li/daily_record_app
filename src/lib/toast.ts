@@ -1,32 +1,32 @@
-import { toast } from "sonner";
+import { toast } from "sonner"
 
 // Success toast
 export const showSuccess = (message: string) => {
-  console.log("showSuccess", message);
-  toast.success(message);
-};
+  console.log("showSuccess", message)
+  toast.success(message)
+}
 
 // Error toast
 export const showError = (message: string) => {
-  console.error("showError", message);
-  toast.error(message);
-};
+  console.error("showError", message)
+  toast.error(message)
+}
 
 // Info toast
 export const showInfo = (message: string) => {
-  console.info("showInfo", message);
-  toast.info(message);
-};
+  console.info("showInfo", message)
+  toast.info(message)
+}
 
 // Warning toast
 export const showWarning = (message: string) => {
-  console.warn("showWarning", message);
-  toast.warning(message);
-};
+  console.warn("showWarning", message)
+  toast.warning(message)
+}
 
 // Promise toast for async operations
-export const showPromise = (
-  promise: Promise<any>,
+export const showPromise = <T>(
+  promise: Promise<T>,
   {
     loading = "Loading...",
     success = "Operation completed successfully!",
@@ -41,5 +41,5 @@ export const showPromise = (
     loading,
     success,
     error,
-  });
-};
+  })
+}

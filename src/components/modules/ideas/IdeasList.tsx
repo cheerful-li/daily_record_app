@@ -1,6 +1,6 @@
-import { observer } from 'mobx-react-lite';
-import type { Idea } from '../../../services/database';
-import IdeaCard from './IdeaCard';
+import { observer } from 'mobx-react-lite'
+import type { Idea } from '../../../services/database'
+import IdeaCard from './IdeaCard'
 
 interface IdeasListProps {
   ideas: Idea[];
@@ -19,7 +19,7 @@ const IdeasList = observer(({ ideas, onEdit, onDelete }: IdeasListProps) => {
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -33,7 +33,7 @@ const IdeasList = observer(({ ideas, onEdit, onDelete }: IdeasListProps) => {
         />
       ))}
     </div>
-  );
-});
+  )
+})
 
-export default IdeasList;
+export default IdeasList

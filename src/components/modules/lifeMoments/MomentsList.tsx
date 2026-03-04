@@ -1,6 +1,6 @@
-import { observer } from 'mobx-react-lite';
-import type { LifeMoment } from '../../../services/database';
-import MomentCard from './MomentCard';
+import { observer } from 'mobx-react-lite'
+import type { LifeMoment } from '../../../services/database'
+import MomentCard from './MomentCard'
 
 interface MomentsListProps {
   moments: LifeMoment[];
@@ -19,7 +19,7 @@ const MomentsList = observer(({ moments, onEdit, onDelete }: MomentsListProps) =
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -33,7 +33,7 @@ const MomentsList = observer(({ moments, onEdit, onDelete }: MomentsListProps) =
         />
       ))}
     </div>
-  );
-});
+  )
+})
 
-export default MomentsList;
+export default MomentsList

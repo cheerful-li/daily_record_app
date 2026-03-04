@@ -1,5 +1,6 @@
-import { createContext, ReactNode, useContext } from 'react';
-import rootStore from './RootStore';
+import { createContext, useContext } from "react";
+import type { ReactNode } from "react";
+import rootStore from "./RootStore";
 
 // Create the context
 const StoreContext = createContext(rootStore);
@@ -11,9 +12,7 @@ interface StoreProviderProps {
 
 export const StoreProvider = ({ children }: StoreProviderProps) => {
   return (
-    <StoreContext.Provider value={rootStore}>
-      {children}
-    </StoreContext.Provider>
+    <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>
   );
 };
 
@@ -23,8 +22,10 @@ export const useStore = () => useContext(StoreContext);
 // Specialized hooks for each store
 export const useHabitStore = () => useContext(StoreContext).habitStore;
 export const useCheckInStore = () => useContext(StoreContext).checkInStore;
-export const useLifeMomentStore = () => useContext(StoreContext).lifeMomentStore;
+export const useLifeMomentStore = () =>
+  useContext(StoreContext).lifeMomentStore;
 export const useTaskStore = () => useContext(StoreContext).taskStore;
 export const useIdeaStore = () => useContext(StoreContext).ideaStore;
-export const useRelationshipStore = () => useContext(StoreContext).relationshipStore;
+export const useRelationshipStore = () =>
+  useContext(StoreContext).relationshipStore;
 export const useUIStore = () => useContext(StoreContext).uiStore;

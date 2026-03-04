@@ -1,33 +1,33 @@
-import { observer } from 'mobx-react-lite';
-import { useState, useEffect } from 'react';
-import { useUIStore } from '../../stores/StoreContext';
+import { observer } from 'mobx-react-lite'
+import { useState, useEffect } from 'react'
+import { useUIStore } from '../../stores/StoreContext'
 
-import Habits from './Habits';
-import LifeMoments from './LifeMoments';
-import Tasks from './Tasks';
-import Relationships from './Relationships';
-import Ideas from './Ideas';
-import Statistics from './Statistics';
+import Habits from './Habits'
+import LifeMoments from './LifeMoments'
+import Tasks from './Tasks'
+import Relationships from './Relationships'
+import Ideas from './Ideas'
+import Statistics from './Statistics'
 
 const ModuleRenderer = observer(() => {
-  const uiStore = useUIStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const uiStore = useUIStore()
+  const [isLoading, setIsLoading] = useState(true)
   
   useEffect(() => {
     // 模拟模块加载过程
     const loadModule = async () => {
-      setIsLoading(true);
-      uiStore.setModuleLoading(uiStore.activeModule, true);
+      setIsLoading(true)
+      uiStore.setModuleLoading(uiStore.activeModule, true)
       
       // 模拟数据加载延迟
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 300))
       
-      setIsLoading(false);
-      uiStore.setModuleLoading(uiStore.activeModule, false);
-    };
+      setIsLoading(false)
+      uiStore.setModuleLoading(uiStore.activeModule, false)
+    }
     
-    loadModule();
-  }, [uiStore.activeModule]);
+    loadModule()
+  }, [uiStore, uiStore.activeModule])
 
   const renderModule = () => {
     if (isLoading) {
@@ -38,26 +38,26 @@ const ModuleRenderer = observer(() => {
             <p className="text-muted-foreground">加载{getModuleName(uiStore.activeModule)}中...</p>
           </div>
         </div>
-      );
+      )
     }
     
     switch (uiStore.activeModule) {
       case 'habits':
-        return <Habits />;
+        return <Habits />
       case 'lifeMoments':
-        return <LifeMoments />;
+        return <LifeMoments />
       case 'tasks':
-        return <Tasks />;
+        return <Tasks />
       case 'relationships':
-        return <Relationships />;
+        return <Relationships />
       case 'ideas':
-        return <Ideas />;
+        return <Ideas />
       case 'statistics':
-        return <Statistics />;
+        return <Statistics />
       default:
-        return <Habits />;
+        return <Habits />
     }
-  };
+  }
   
   // 获取模块的中文名称
   const getModuleName = (module: string): string => {
@@ -68,12 +68,12 @@ const ModuleRenderer = observer(() => {
       relationships: '关系维护',
       ideas: '灵感收集',
       statistics: '统计分析'
-    };
+    }
     
-    return moduleNames[module] || '模块';
-  };
+    return moduleNames[module] || '模块'
+  }
 
-  return <div className="h-full">{renderModule()}</div>;
-});
+  return <div className="h-full">{renderModule()}</div>
+})
 
-export default ModuleRenderer;
+export default ModuleRenderer

@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Card, CardContent } from '../../ui/card';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardContent } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
+import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 interface FilterOptions {
   searchText: string;
@@ -18,37 +18,37 @@ interface MomentFilterProps {
 }
 
 const MomentFilter = observer(({ onFilterChange, availableTags }: MomentFilterProps) => {
-  const [searchText, setSearchText] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
+  const [searchText, setSearchText] = useState('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [fromDate, setFromDate] = useState<string>('')
+  const [toDate, setToDate] = useState<string>('')
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchText = e.target.value;
-    setSearchText(newSearchText);
-    applyFilters(newSearchText, selectedTags, fromDate, toDate);
-  };
+    const newSearchText = e.target.value
+    setSearchText(newSearchText)
+    applyFilters(newSearchText, selectedTags, fromDate, toDate)
+  }
 
   const handleTagClick = (tag: string) => {
     const newSelectedTags = selectedTags.includes(tag)
       ? selectedTags.filter(t => t !== tag)
-      : [...selectedTags, tag];
+      : [...selectedTags, tag]
       
-    setSelectedTags(newSelectedTags);
-    applyFilters(searchText, newSelectedTags, fromDate, toDate);
-  };
+    setSelectedTags(newSelectedTags)
+    applyFilters(searchText, newSelectedTags, fromDate, toDate)
+  }
 
   const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFromDate = e.target.value;
-    setFromDate(newFromDate);
-    applyFilters(searchText, selectedTags, newFromDate, toDate);
-  };
+    const newFromDate = e.target.value
+    setFromDate(newFromDate)
+    applyFilters(searchText, selectedTags, newFromDate, toDate)
+  }
 
   const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newToDate = e.target.value;
-    setToDate(newToDate);
-    applyFilters(searchText, selectedTags, fromDate, newToDate);
-  };
+    const newToDate = e.target.value
+    setToDate(newToDate)
+    applyFilters(searchText, selectedTags, fromDate, newToDate)
+  }
 
   const applyFilters = (
     search: string,
@@ -59,35 +59,35 @@ const MomentFilter = observer(({ onFilterChange, availableTags }: MomentFilterPr
     const filterOptions: FilterOptions = {
       searchText: search,
       tags: tags,
-    };
+    }
 
     if (from) {
-      const fromDate = new Date(from);
+      const fromDate = new Date(from)
       // 确保日期有效
       if (!isNaN(fromDate.getTime())) {
-        filterOptions.fromDate = fromDate;
+        filterOptions.fromDate = fromDate
       }
     }
 
     if (to) {
-      const toDate = new Date(to);
+      const toDate = new Date(to)
       // 设置时间为当天的结束时间，并确保日期有效
       if (!isNaN(toDate.getTime())) {
-        toDate.setHours(23, 59, 59, 999);
-        filterOptions.toDate = toDate;
+        toDate.setHours(23, 59, 59, 999)
+        filterOptions.toDate = toDate
       }
     }
 
-    onFilterChange(filterOptions);
-  };
+    onFilterChange(filterOptions)
+  }
 
   const clearFilters = () => {
-    setSearchText('');
-    setSelectedTags([]);
-    setFromDate('');
-    setToDate('');
-    onFilterChange({ searchText: '', tags: [] });
-  };
+    setSearchText('')
+    setSelectedTags([])
+    setFromDate('')
+    setToDate('')
+    onFilterChange({ searchText: '', tags: [] })
+  }
 
   return (
     <Card>
@@ -154,7 +154,7 @@ const MomentFilter = observer(({ onFilterChange, availableTags }: MomentFilterPr
         </Button>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default MomentFilter;
+export default MomentFilter

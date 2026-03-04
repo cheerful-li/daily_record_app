@@ -1,12 +1,10 @@
-import { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
-import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
-import { Button } from '../../ui/button';
-import { DatePicker } from '../../ui/date-picker';
-import type { Relationship } from '../../../services/database';
-import { formatDate } from '../../../utils/formatters';
+import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog'
+import { Textarea } from '../../ui/textarea'
+import { Button } from '../../ui/button'
+import { DatePicker } from '../../ui/date-picker'
+import type { Relationship } from '../../../services/database'
 
 interface ContactFormProps {
   open: boolean;
@@ -17,48 +15,48 @@ interface ContactFormProps {
 
 const ContactForm = observer(({ open, onClose, onSubmit, relationship }: ContactFormProps) => {
 
-  const [lastContact, setLastContact] = useState<Date>(new Date());
-  const [nextContact, setNextContact] = useState<Date | undefined>(undefined);
-  const [notes, setNotes] = useState('');
+  const [lastContact, setLastContact] = useState<Date>(new Date())
+  const [nextContact, setNextContact] = useState<Date | undefined>(undefined)
+  const [notes, setNotes] = useState('')
 
   // Calculate suggested next contact date based on relationship category
   const suggestNextContact = () => {
-    const today = new Date();
-    let nextDate = new Date(today);
+    const today = new Date()
+    const nextDate = new Date(today)
     
     switch (relationship?.category) {
       case '家人':
         // For family, suggest once a week
-        nextDate.setDate(today.getDate() + 7);
-        break;
+        nextDate.setDate(today.getDate() + 7)
+        break
       case '朋友':
         // For friends, suggest once every two weeks
-        nextDate.setDate(today.getDate() + 14);
-        break;
+        nextDate.setDate(today.getDate() + 14)
+        break
       case '同事':
         // For colleagues, suggest once every month
-        nextDate.setMonth(today.getMonth() + 1);
-        break;
+        nextDate.setMonth(today.getMonth() + 1)
+        break
       case '同学':
         // For classmates, suggest once every month
-        nextDate.setMonth(today.getMonth() + 1);
-        break;
+        nextDate.setMonth(today.getMonth() + 1)
+        break
       default:
         // Default is once every month
-        nextDate.setMonth(today.getMonth() + 1);
+        nextDate.setMonth(today.getMonth() + 1)
     }
     
-    setNextContact(nextDate);
-  };
+    setNextContact(nextDate)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     
-    onSubmit(relationship?.id, lastContact, nextContact, notes);
-    onClose();
-  };
+    onSubmit(relationship?.id, lastContact, nextContact, notes)
+    onClose()
+  }
 
-  if (!relationship) return null;
+  if (!relationship) return null
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -74,7 +72,6 @@ const ContactForm = observer(({ open, onClose, onSubmit, relationship }: Contact
                 date={lastContact}
                 onDateChange={(date) => date && setLastContact(date)}
                 placeholder="选择联系日期"
-                required={true}
               />
             </div>
 
@@ -117,7 +114,7 @@ const ContactForm = observer(({ open, onClose, onSubmit, relationship }: Contact
         </form>
       </DialogContent>
     </Dialog>
-  );
-});
+  )
+})
 
-export default ContactForm;
+export default ContactForm

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { useLifeMomentStore } from "../../stores/StoreContext";
-import { Button } from "../ui/button";
-import { PlusIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
-import type { LifeMoment } from "../../services/database";
-import MomentsList from "./lifeMoments/MomentsList";
-import MomentForm from "./lifeMoments/MomentForm";
-import MomentFilter from "./lifeMoments/MomentFilter";
+import { useState, useEffect, useCallback } from "react"
+import { observer } from "mobx-react-lite"
+import { useLifeMomentStore } from "../../stores/StoreContext"
+import { Button } from "../ui/button"
+import { PlusIcon, MixerHorizontalIcon } from "@radix-ui/react-icons"
+import type { LifeMoment } from "../../services/database"
+import MomentsList from "./lifeMoments/MomentsList"
+import MomentForm from "./lifeMoments/MomentForm"
+import MomentFilter from "./lifeMoments/MomentFilter"
 
 interface FilterOptions {
   searchText: string;
@@ -16,127 +16,128 @@ interface FilterOptions {
 }
 
 const LifeMoments = observer(() => {
-  const lifeMomentStore = useLifeMomentStore();
+  const lifeMomentStore = useLifeMomentStore()
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedMoment, setSelectedMoment] = useState<
     LifeMoment | undefined
-  >();
-  const [filteredMoments, setFilteredMoments] = useState<LifeMoment[]>([]);
-  const [allTags, setAllTags] = useState<string[]>([]);
+  >()
+  const [filteredMoments, setFilteredMoments] = useState<LifeMoment[]>([])
+  const [allTags, setAllTags] = useState<string[]>([])
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: "",
     tags: [],
-  });
-  const [showFilters, setShowFilters] = useState(false); // 控制筛选面板的显示/隐藏
+  })
+  const [showFilters, setShowFilters] = useState(false) // 控制筛选面板的显示/隐藏
 
   useEffect(() => {
-    lifeMomentStore.loadLifeMoments();
-  }, [lifeMomentStore]);
+    lifeMomentStore.loadLifeMoments()
+  }, [lifeMomentStore])
 
-  // Update filtered moments when store data changes or filter changes
-  useEffect(() => {
-    applyFilters();
-  }, [lifeMomentStore.lifeMoments, filterOptions]);
-
-  // Extract all unique tags from moments
-  useEffect(() => {
-    const tags = new Set<string>();
-    lifeMomentStore.lifeMoments.forEach((moment) => {
-      moment.tags.forEach((tag) => tags.add(tag));
-    });
-    setAllTags(Array.from(tags));
-  }, [lifeMomentStore.lifeMoments]);
-
-  const handleAddMoment = async (
-    moment: Omit<LifeMoment, "id" | "createdAt" | "updatedAt">
-  ) => {
-    await lifeMomentStore.addLifeMoment(moment);
-    // 重新应用筛选器，刷新列表
-    applyFilters();
-  };
-
-  const handleEditMoment = async (
-    moment: Omit<LifeMoment, "id" | "createdAt" | "updatedAt">
-  ) => {
-    if (selectedMoment?.id) {
-      console.log('开始更新生活点滴:', { id: selectedMoment.id, data: moment });
-      await lifeMomentStore.updateLifeMoment(selectedMoment.id, moment);
-      // 重新加载所有生活点滴数据
-      await lifeMomentStore.loadLifeMoments();
-      // 重新应用筛选器，刷新列表
-      applyFilters();
-      console.log('更新后的生活点滴数据:', lifeMomentStore.lifeMoments);
-    }
-  };
-
-  const handleDeleteMoment = async (momentId: number | undefined) => {
-    if (momentId) {
-      if (confirm("确定要删除这条记录吗？")) {
-        await lifeMomentStore.deleteLifeMoment(momentId);
-        if (selectedMoment?.id === momentId) {
-          setSelectedMoment(undefined);
-        }
-      }
-    }
-  };
-
-  const handleEditClick = (moment: LifeMoment) => {
-    setSelectedMoment(moment);
-    setIsEditDialogOpen(true);
-  };
-
-  // 删除了handleSelectMoment函数，不再需要详情查看功能
-
-  const handleFilterChange = (options: FilterOptions) => {
-    setFilterOptions(options);
-  };
-
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
-
-  const applyFilters = () => {
-    let filtered = [...lifeMomentStore.lifeMoments];
+  // 定义 applyFilters 函数
+  const applyFilters = useCallback(() => {
+    let filtered = [...lifeMomentStore.lifeMoments]
 
     // Filter by search text (in title or description)
     if (filterOptions.searchText) {
-      const searchLower = filterOptions.searchText.toLowerCase();
+      const searchLower = filterOptions.searchText.toLowerCase()
       filtered = filtered.filter(
         (moment) =>
           moment.title.toLowerCase().includes(searchLower) ||
           moment.description.toLowerCase().includes(searchLower)
-      );
+      )
     }
 
     // Filter by tags
     if (filterOptions.tags.length > 0) {
       filtered = filtered.filter((moment) =>
         filterOptions.tags.some((tag) => moment.tags.includes(tag))
-      );
+      )
     }
 
     // Filter by date range
     if (filterOptions.fromDate) {
       filtered = filtered.filter(
         (moment) => new Date(moment.date) >= filterOptions.fromDate!
-      );
+      )
     }
 
     if (filterOptions.toDate) {
       filtered = filtered.filter(
         (moment) => new Date(moment.date) <= filterOptions.toDate!
-      );
+      )
     }
 
     // Sort by date, most recent first
     filtered.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    )
 
-    setFilteredMoments(filtered);
-  };
+    setFilteredMoments(filtered)
+  }, [lifeMomentStore.lifeMoments, filterOptions])
+
+  // Update filtered moments when store data changes or filter changes
+  useEffect(() => {
+    applyFilters()
+  }, [lifeMomentStore.lifeMoments, filterOptions, applyFilters])
+
+  // Extract all unique tags from moments
+  useEffect(() => {
+    const tags = new Set<string>()
+    lifeMomentStore.lifeMoments.forEach((moment) => {
+      moment.tags.forEach((tag) => tags.add(tag))
+    })
+    setAllTags(Array.from(tags))
+  }, [lifeMomentStore.lifeMoments])
+
+  const handleAddMoment = async (
+    moment: Omit<LifeMoment, "id" | "createdAt" | "updatedAt">
+  ) => {
+    await lifeMomentStore.addLifeMoment(moment)
+    // 重新应用筛选器，刷新列表
+    applyFilters()
+  }
+
+  const handleEditMoment = async (
+    moment: Omit<LifeMoment, "id" | "createdAt" | "updatedAt">
+  ) => {
+    if (selectedMoment?.id) {
+      console.log('开始更新生活点滴:', { id: selectedMoment.id, data: moment })
+      await lifeMomentStore.updateLifeMoment(selectedMoment.id, moment)
+      // 重新加载所有生活点滴数据
+      await lifeMomentStore.loadLifeMoments()
+      // 重新应用筛选器，刷新列表
+      applyFilters()
+      console.log('更新后的生活点滴数据:', lifeMomentStore.lifeMoments)
+    }
+  }
+
+  const handleDeleteMoment = async (momentId: number | undefined) => {
+    if (momentId) {
+      if (confirm("确定要删除这条记录吗？")) {
+        await lifeMomentStore.deleteLifeMoment(momentId)
+        if (selectedMoment?.id === momentId) {
+          setSelectedMoment(undefined)
+        }
+      }
+    }
+  }
+
+  const handleEditClick = (moment: LifeMoment) => {
+    setSelectedMoment(moment)
+    setIsEditDialogOpen(true)
+  }
+
+  // 删除了handleSelectMoment函数，不再需要详情查看功能
+
+  const handleFilterChange = (options: FilterOptions) => {
+    setFilterOptions(options)
+  }
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters)
+  }
 
   return (
     <div className="container mx-auto pb-20 md:pb-0">
@@ -228,7 +229,7 @@ const LifeMoments = observer(() => {
         availableTags={allTags}
       />
     </div>
-  );
-});
+  )
+})
 
-export default LifeMoments;
+export default LifeMoments

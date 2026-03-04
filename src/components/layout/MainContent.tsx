@@ -1,9 +1,7 @@
-import { observer } from 'mobx-react-lite';
-import { useUIStore } from '../../stores/StoreContext';
-import { cn } from '../../lib/utils';
+import { observer } from 'mobx-react-lite'
+import { cn } from '../../lib/utils'
 
 const MainContent: React.FC<{ children: React.ReactNode }> = observer(({ children }) => {
-  const uiStore = useUIStore();
 
   return (
     <main
@@ -16,7 +14,7 @@ const MainContent: React.FC<{ children: React.ReactNode }> = observer(({ childre
         {children}
       </div>
     </main>
-  );
-});
+  )
+})
 
-export default MainContent;
+export default MainContent

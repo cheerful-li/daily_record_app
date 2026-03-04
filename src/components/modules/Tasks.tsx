@@ -1,175 +1,123 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useTaskStore } from '../../stores/StoreContext';
-import { Button } from '../ui/button';
-import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons';
-import type { Task } from '../../services/database';
-import TasksList from './tasks/TasksList';
-import TaskForm from './tasks/TaskForm';
-import TaskFilter from './tasks/TaskFilter';
-import TaskStats from './tasks/TaskStats';
+import { useState, useEffect, useMemo } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useTaskStore } from '../../stores/StoreContext'
+import { Button } from '../ui/button'
+import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons'
+import type { Task } from '../../services/database'
+import TasksList from './tasks/TasksList'
+import TaskForm from './tasks/TaskForm'
+import TaskFilter from './tasks/TaskFilter'
+import TaskStats from './tasks/TaskStats'
 
 interface FilterOptions {
   searchText: string;
   type: 'all' | 'work' | 'growth';
   status: 'all' | 'pending' | 'in-progress' | 'completed';
   priority: 'all' | 'high' | 'medium' | 'low';
-  // 移除截止日期范围
-  // dueDateRange: {
-  //   from: string;
-  //   to: string;
-  // };
 }
 
 const Tasks = observer(() => {
-  const taskStore = useTaskStore();
+  const taskStore = useTaskStore()
   
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | undefined>();
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>()
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText: '',
     type: 'all',
     status: 'all',
     priority: 'all',
-    // 移除截止日期范围
-    // dueDateRange: {
-    //   from: '',
-    //   to: ''
-    // }
-  });
-  const [showFilters, setShowFilters] = useState(false); // 控制筛选面板的显示/隐藏
+  })
+  const [showFilters, setShowFilters] = useState(false) // 控制筛选面板的显示/隐藏
 
   useEffect(() => {
-    taskStore.loadTasks();
-  }, [taskStore]);
+    taskStore.loadTasks()
+  }, [taskStore])
 
-  // Update filtered tasks when store data changes or filter changes
-  useEffect(() => {
-    applyFilters();
-  }, [taskStore.tasks, filterOptions]);
-
-  const handleAddTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    await taskStore.addTask(task);
-  };
-
-  const handleEditTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (selectedTask?.id) {
-      await taskStore.updateTask(selectedTask.id, task);
-    }
-  };
-
-  const handleDeleteTask = async (taskId: number | undefined) => {
-    if (taskId) {
-      if (confirm('确定要删除这个任务吗？')) {
-        await taskStore.deleteTask(taskId);
-      }
-    }
-  };
-
-  const handleEditClick = (task: Task) => {
-    setSelectedTask(task);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleStatusChange = async (task: Task, newStatus: 'pending' | 'in-progress' | 'completed') => {
-    if (task.id) {
-      await taskStore.updateTask(task.id, { ...task, status: newStatus });
-    }
-  };
-
-  const handleFilterChange = (options: FilterOptions) => {
-    setFilterOptions(options);
-  };
-  
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
-
-  const applyFilters = () => {
-    let filtered = [...taskStore.tasks];
+  // 使用useMemo计算过滤后的任务列表
+  const filteredTasks = useMemo(() => {
+    let filtered = [...taskStore.tasks]
 
     // Filter by search text (in title or description)
     if (filterOptions.searchText) {
-      const searchLower = filterOptions.searchText.toLowerCase();
+      const searchLower = filterOptions.searchText.toLowerCase()
       filtered = filtered.filter(
         task =>
           task.title.toLowerCase().includes(searchLower) ||
           task.description.toLowerCase().includes(searchLower)
-      );
+      )
     }
 
     // Filter by type
     if (filterOptions.type !== 'all') {
-      filtered = filtered.filter(task => task.type === filterOptions.type);
+      filtered = filtered.filter(task => task.type === filterOptions.type)
     }
 
     // Filter by status
     if (filterOptions.status !== 'all') {
-      filtered = filtered.filter(task => task.status === filterOptions.status);
+      filtered = filtered.filter(task => task.status === filterOptions.status)
     }
 
     // Filter by priority
     if (filterOptions.priority !== 'all') {
-      filtered = filtered.filter(task => task.priority === filterOptions.priority);
+      filtered = filtered.filter(task => task.priority === filterOptions.priority)
     }
 
-    // 移除截止日期范围筛选
-    // if (filterOptions.dueDateRange.from) {
-    //   const fromDate = new Date(filterOptions.dueDateRange.from);
-    //   filtered = filtered.filter(
-    //     task => task.dueDate && new Date(task.dueDate) >= fromDate
-    //   );
-    // }
-
-    // if (filterOptions.dueDateRange.to) {
-    //   const toDate = new Date(filterOptions.dueDateRange.to);
-    //   // Set time to end of day for inclusive comparison
-    //   toDate.setHours(23, 59, 59, 999);
-    //   filtered = filtered.filter(
-    //     task => task.dueDate && new Date(task.dueDate) <= toDate
-    //   );
-    // }
-
-    // 改进的多级排序逻辑
-    filtered.sort((a, b) => {
+    // 排序逻辑
+    return filtered.sort((a, b) => {
       // 1. 首先按状态排序: in-progress > pending > completed
-      const statusOrder = { 'in-progress': 0, 'pending': 1, 'completed': 2 };
-      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
-      if (statusDiff !== 0) return statusDiff;
+      const statusOrder = { 'in-progress': 0, 'pending': 1, 'completed': 2 }
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+      if (statusDiff !== 0) return statusDiff
       
-      // 2. 对于未完成的任务，按截止日期从近到远排序
-      if (a.status !== 'completed' && b.status !== 'completed') {
-        // 如果两个任务都有截止日期，按日期比较
-        if (a.dueDate && b.dueDate) {
-          const dueDateA = new Date(a.dueDate).getTime();
-          const dueDateB = new Date(b.dueDate).getTime();
-          const dateDiff = dueDateA - dueDateB;
-          if (dateDiff !== 0) return dateDiff;
-        } 
-        // 有截止日期的排在前面
-        else if (a.dueDate && !b.dueDate) {
-          return -1;
-        } 
-        else if (!a.dueDate && b.dueDate) {
-          return 1;
-        }
+      // 2. 然后按优先级排序（high -> medium -> low）
+      const priorityOrder = { high: 0, medium: 1, low: 2 }
+      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority]
+      if (priorityDiff !== 0) return priorityDiff
+      
+      // 3. 最后按创建时间从新到旧排序
+      const timeA = new Date(a.createdAt).getTime()
+      const timeB = new Date(b.createdAt).getTime()
+      return timeB - timeA // 降序排列（从新到旧）
+    })
+  }, [taskStore.tasks, filterOptions])
+
+  const handleAddTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    await taskStore.addTask(task)
+  }
+
+  const handleEditTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (selectedTask?.id) {
+      await taskStore.updateTask(selectedTask.id, task)
+    }
+  }
+
+  const handleDeleteTask = async (taskId: number | undefined) => {
+    if (taskId) {
+      if (confirm('确定要删除这个任务吗？')) {
+        await taskStore.deleteTask(taskId)
       }
-      
-      // 3. 然后按优先级排序（high -> medium -> low）
-      const priorityOrder = { high: 0, medium: 1, low: 2 };
-      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
-      if (priorityDiff !== 0) return priorityDiff;
-      
-      // 4. 最后按创建时间从新到旧排序
-      const timeA = new Date(a.createdAt).getTime();
-      const timeB = new Date(b.createdAt).getTime();
-      return timeB - timeA; // 这里用 B-A 得到降序排列（从新到旧）
-    });
-    
-    setFilteredTasks(filtered);
-  };
+    }
+  }
+
+  const handleEditClick = (task: Task) => {
+    setSelectedTask(task)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleStatusChange = async (task: Task, newStatus: 'pending' | 'in-progress' | 'completed') => {
+    if (task.id) {
+      await taskStore.updateTask(task.id, { ...task, status: newStatus })
+    }
+  }
+
+  const handleFilterChange = (options: FilterOptions) => {
+    setFilterOptions(options)
+  }
+  
+  const toggleFilters = () => {
+    setShowFilters(!showFilters)
+  }
 
   return (
     <div className="container mx-auto pb-20 md:pb-0">
@@ -246,7 +194,7 @@ const Tasks = observer(() => {
         isEditing={true}
       />
     </div>
-  );
-});
+  )
+})
 
-export default Tasks;
+export default Tasks

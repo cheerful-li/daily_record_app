@@ -1,15 +1,15 @@
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../ui/card';
-import { Button } from '../../ui/button';
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../ui/card'
+import { Button } from '../../ui/button'
 import { 
   PersonIcon, 
   CalendarIcon, 
   Pencil1Icon, 
   TrashIcon,
   ChatBubbleIcon
-} from '@radix-ui/react-icons';
-import type { Relationship } from '../../../services/database';
-import { formatDate, formatSimpleDate } from '../../../utils/formatters';
+} from '@radix-ui/react-icons'
+import type { Relationship } from '../../../services/database'
+import { formatSimpleDate } from '../../../utils/formatters'
 
 interface RelationshipCardProps {
   relationship: Relationship;
@@ -26,39 +26,39 @@ const RelationshipCard = observer(({
 }: RelationshipCardProps) => {
 
   const isContactDue = () => {
-    if (!relationship.nextContact) return false;
-    const nextContact = new Date(relationship.nextContact);
-    const today = new Date();
-    return nextContact <= today;
-  };
+    if (!relationship.nextContact) return false
+    const nextContact = new Date(relationship.nextContact)
+    const today = new Date()
+    return nextContact <= today
+  }
 
   const getDaysUntilNextContact = () => {
-    if (!relationship.nextContact) return null;
+    if (!relationship.nextContact) return null
     
-    const nextContact = new Date(relationship.nextContact);
-    const today = new Date();
-    const diffTime = nextContact.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const nextContact = new Date(relationship.nextContact)
+    const today = new Date()
+    const diffTime = nextContact.getTime() - today.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
-    return diffDays;
-  };
+    return diffDays
+  }
 
   const getContactText = () => {
-    const days = getDaysUntilNextContact();
+    const days = getDaysUntilNextContact()
     
-    if (days === null) return null;
+    if (days === null) return null
     
     if (days < 0) {
-      return `逾期 ${Math.abs(days)} 天`;
+      return `逾期 ${Math.abs(days)} 天`
     } else if (days === 0) {
-      return `今天应联系`;
+      return `今天应联系`
     } else {
-      return `${days} 天后联系`;
+      return `${days} 天后联系`
     }
-  };
+  }
 
-  const contactText = getContactText();
-  const contactDue = isContactDue();
+  const contactText = getContactText()
+  const contactDue = isContactDue()
 
   return (
     <Card className="w-full">
@@ -122,7 +122,7 @@ const RelationshipCard = observer(({
         </div>
       </CardFooter>
     </Card>
-  );
-});
+  )
+})
 
-export default RelationshipCard;
+export default RelationshipCard

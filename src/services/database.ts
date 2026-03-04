@@ -1,5 +1,5 @@
-import { openDB } from "idb";
-import type { IDBPDatabase } from "idb";
+import { openDB } from "idb"
+import type { IDBPDatabase } from "idb"
 
 // Define database types according to the design document
 export interface Habit {
@@ -115,113 +115,113 @@ export interface DailyRecordDB {
 }
 
 // Database version
-const DB_VERSION = 1;
-const DB_NAME = "daily-record-db";
+const DB_VERSION = 1
+const DB_NAME = "daily-record-db"
 
 // Singleton instance of the database
-let dbInstance: IDBPDatabase<DailyRecordDB> | null = null;
+let dbInstance: IDBPDatabase<DailyRecordDB> | null = null
 
 // Initialize the database
 export async function initDatabase(): Promise<IDBPDatabase<DailyRecordDB>> {
-  if (dbInstance) return dbInstance;
+  if (dbInstance) return dbInstance
 
   const db = await openDB<DailyRecordDB>(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion, newVersion, transaction) {
+    upgrade(db) {
       // Create stores if they don't exist
       if (!db.objectStoreNames.contains("habits")) {
         const habitsStore = db.createObjectStore("habits", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        habitsStore.createIndex("by-name", "name");
-        habitsStore.createIndex("by-frequency", "frequency");
-        habitsStore.createIndex("by-active", "active");
+        })
+        habitsStore.createIndex("by-name", "name")
+        habitsStore.createIndex("by-frequency", "frequency")
+        habitsStore.createIndex("by-active", "active")
       }
 
       if (!db.objectStoreNames.contains("checkIns")) {
         const checkInsStore = db.createObjectStore("checkIns", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        checkInsStore.createIndex("by-habitId", "habitId");
-        checkInsStore.createIndex("by-date", "date");
-        checkInsStore.createIndex("by-status", "status");
+        })
+        checkInsStore.createIndex("by-habitId", "habitId")
+        checkInsStore.createIndex("by-date", "date")
+        checkInsStore.createIndex("by-status", "status")
       }
 
       if (!db.objectStoreNames.contains("lifeMoments")) {
         const lifeMomentsStore = db.createObjectStore("lifeMoments", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        lifeMomentsStore.createIndex("by-date", "date");
-        lifeMomentsStore.createIndex("by-tags", "tags", { multiEntry: true });
+        })
+        lifeMomentsStore.createIndex("by-date", "date")
+        lifeMomentsStore.createIndex("by-tags", "tags", { multiEntry: true })
       }
 
       if (!db.objectStoreNames.contains("tasks")) {
         const tasksStore = db.createObjectStore("tasks", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        tasksStore.createIndex("by-type", "type");
-        tasksStore.createIndex("by-status", "status");
-        tasksStore.createIndex("by-dueDate", "dueDate");
-        tasksStore.createIndex("by-priority", "priority");
+        })
+        tasksStore.createIndex("by-type", "type")
+        tasksStore.createIndex("by-status", "status")
+        tasksStore.createIndex("by-dueDate", "dueDate")
+        tasksStore.createIndex("by-priority", "priority")
       }
 
       if (!db.objectStoreNames.contains("ideas")) {
         const ideasStore = db.createObjectStore("ideas", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        ideasStore.createIndex("by-date", "date");
-        ideasStore.createIndex("by-category", "category");
-        ideasStore.createIndex("by-tags", "tags", { multiEntry: true });
+        })
+        ideasStore.createIndex("by-date", "date")
+        ideasStore.createIndex("by-category", "category")
+        ideasStore.createIndex("by-tags", "tags", { multiEntry: true })
       }
 
       if (!db.objectStoreNames.contains("relationships")) {
         const relationshipsStore = db.createObjectStore("relationships", {
           keyPath: "id",
           autoIncrement: true,
-        });
-        relationshipsStore.createIndex("by-name", "name");
-        relationshipsStore.createIndex("by-category", "category");
-        relationshipsStore.createIndex("by-nextContact", "nextContact");
+        })
+        relationshipsStore.createIndex("by-name", "name")
+        relationshipsStore.createIndex("by-category", "category")
+        relationshipsStore.createIndex("by-nextContact", "nextContact")
       }
     },
-  });
+  })
 
-  dbInstance = db;
-  return db;
+  dbInstance = db
+  return db
 }
 
 // Generic CRUD operations for database entities
 export async function getAll<T extends keyof DailyRecordDB>(
   storeName: T
 ): Promise<DailyRecordDB[T]["value"][]> {
-  const db = await initDatabase();
-  return db.getAll(storeName);
+  const db = await initDatabase()
+  return db.getAll(storeName)
 }
 
 export async function getById<T extends keyof DailyRecordDB>(
   storeName: T,
   id: number
 ): Promise<DailyRecordDB[T]["value"] | undefined> {
-  const db = await initDatabase();
-  return db.get(storeName, id);
+  const db = await initDatabase()
+  return db.get(storeName, id)
 }
 
 export async function add<T extends keyof DailyRecordDB>(
   storeName: T,
   item: Omit<DailyRecordDB[T]["value"], "id">
 ): Promise<number> {
-  const db = await initDatabase();
-  const now = new Date();
+  const db = await initDatabase()
+  const now = new Date()
   const itemWithTimestamps = {
     ...item,
     createdAt: now,
     updatedAt: now,
-  } as DailyRecordDB[T]["value"];
-  return db.add(storeName, itemWithTimestamps);
+  } as DailyRecordDB[T]["value"]
+  return db.add(storeName, itemWithTimestamps) as Promise<number>
 }
 
 export async function update<T extends keyof DailyRecordDB>(
@@ -229,29 +229,29 @@ export async function update<T extends keyof DailyRecordDB>(
   id: number,
   item: Partial<DailyRecordDB[T]["value"]>
 ): Promise<number> {
-  const db = await initDatabase();
-  const existingItem = await db.get(storeName, id);
+  const db = await initDatabase()
+  const existingItem = await db.get(storeName, id)
 
   if (!existingItem) {
-    throw new Error(`Item with id ${id} not found in ${String(storeName)}`);
+    throw new Error(`Item with id ${id} not found in ${String(storeName)}`)
   }
 
   const updatedItem = {
     ...existingItem,
     ...item,
     updatedAt: new Date(),
-  };
+  }
 
-  await db.put(storeName, updatedItem);
-  return id;
+  await db.put(storeName, updatedItem)
+  return id
 }
 
 export async function remove<T extends keyof DailyRecordDB>(
   storeName: T,
   id: number
 ): Promise<void> {
-  const db = await initDatabase();
-  await db.delete(storeName, id);
+  const db = await initDatabase()
+  await db.delete(storeName, id)
 }
 
 // Helper function to query by index
@@ -263,16 +263,16 @@ export async function queryByIndex<
   indexName: I,
   value: DailyRecordDB[T]["indexes"][I]
 ): Promise<DailyRecordDB[T]["value"][]> {
-  const db = await initDatabase();
-  const tx = db.transaction(storeName, "readonly");
-  const store = tx.objectStore(storeName);
-  const index = store.index(indexName as string);
-  return index.getAll(value);
+  const db = await initDatabase()
+  const tx = db.transaction(storeName, "readonly")
+  const store = tx.objectStore(storeName)
+  const index = store.index(indexName as string)
+  return index.getAll(value as IDBValidKey)
 }
 
 // Helper function to clear all data
 export async function clearAllData(): Promise<void> {
-  const db = await initDatabase();
+  const db = await initDatabase()
   const storeNames: Array<keyof DailyRecordDB> = [
     "habits",
     "checkIns",
@@ -280,8 +280,8 @@ export async function clearAllData(): Promise<void> {
     "tasks",
     "ideas",
     "relationships",
-  ];
-  const transaction = db.transaction(storeNames, "readwrite");
+  ]
+  const transaction = db.transaction(storeNames, "readwrite")
 
   await Promise.all([
     transaction.objectStore("habits").clear(),
@@ -291,5 +291,5 @@ export async function clearAllData(): Promise<void> {
     transaction.objectStore("ideas").clear(),
     transaction.objectStore("relationships").clear(),
     transaction.done,
-  ]);
+  ])
 }

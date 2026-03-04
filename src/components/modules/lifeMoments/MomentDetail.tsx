@@ -1,8 +1,8 @@
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card';
-import { CalendarIcon } from '@radix-ui/react-icons';
-import type { LifeMoment } from '../../../services/database';
-import { formatDate } from '../../../utils/formatters';
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card'
+import { CalendarIcon } from '@radix-ui/react-icons'
+import type { LifeMoment } from '../../../services/database'
+import { formatDate } from '../../../utils/formatters'
 
 interface MomentDetailProps {
   moment?: LifeMoment;
@@ -19,7 +19,7 @@ const MomentDetail = observer(({ moment }: MomentDetailProps) => {
           <p className="text-muted-foreground">选择一条记录查看详情</p>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -73,7 +73,7 @@ const MomentDetail = observer(({ moment }: MomentDetailProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default MomentDetail;
+export default MomentDetail

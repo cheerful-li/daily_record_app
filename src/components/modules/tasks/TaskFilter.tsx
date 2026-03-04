@@ -1,21 +1,16 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Card, CardContent } from '../../ui/card';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useState, useEffect, useMemo } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardContent } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
+import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 interface FilterOptions {
   searchText: string;
   type: 'all' | 'work' | 'growth';
   status: 'all' | 'pending' | 'in-progress' | 'completed';
   priority: 'all' | 'high' | 'medium' | 'low';
-  // 移除截止日期范围
-  // dueDateRange: {
-  //   from: string;
-  //   to: string;
-  // };
 }
 
 interface TaskFilterProps {
@@ -23,66 +18,46 @@ interface TaskFilterProps {
 }
 
 const TaskFilter = observer(({ onFilterChange }: TaskFilterProps) => {
-  const [searchText, setSearchText] = useState('');
-  const [type, setType] = useState<'all' | 'work' | 'growth'>('all');
-  const [status, setStatus] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
-  const [priority, setPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  // 移除截止日期相关状态
-  // const [fromDate, setFromDate] = useState<string>('');
-  // const [toDate, setToDate] = useState<string>('');
+  const [searchText, setSearchText] = useState('')
+  const [type, setType] = useState<'all' | 'work' | 'growth'>('all')
+  const [status, setStatus] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all')
+  const [priority, setPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all')
 
+  // 使用useMemo创建过滤选项对象，避免不必要的重新创建
+  const filterOptions = useMemo(() => ({
+    searchText,
+    type,
+    status,
+    priority,
+  }), [searchText, type, status, priority])
+
+  // 当过滤选项变化时，通知父组件
   useEffect(() => {
-    applyFilters();
-  }, [searchText, type, status, priority]);
+    onFilterChange(filterOptions)
+  }, [filterOptions, onFilterChange])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-  };
+    setSearchText(e.target.value)
+  }
 
   const handleTypeChange = (value: string) => {
-    setType(value as 'all' | 'work' | 'growth');
-  };
+    setType(value as 'all' | 'work' | 'growth')
+  }
 
   const handleStatusChange = (value: string) => {
-    setStatus(value as 'all' | 'pending' | 'in-progress' | 'completed');
-  };
+    setStatus(value as 'all' | 'pending' | 'in-progress' | 'completed')
+  }
 
   const handlePriorityChange = (value: string) => {
-    setPriority(value as 'all' | 'high' | 'medium' | 'low');
-  };
-
-  // 移除截止日期相关处理函数
-  // const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFromDate(e.target.value);
-  // };
-  //
-  // const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setToDate(e.target.value);
-  // };
-
-  const applyFilters = () => {
-    onFilterChange({
-      searchText,
-      type,
-      status,
-      priority,
-      // 移除截止日期范围
-      // dueDateRange: {
-      //   from: fromDate,
-      //   to: toDate,
-      // },
-    });
-  };
+    setPriority(value as 'all' | 'high' | 'medium' | 'low')
+  }
 
   const clearFilters = () => {
-    setSearchText('');
-    setType('all');
-    setStatus('all');
-    setPriority('all');
-    // 移除截止日期重置
-    // setFromDate('');
-    // setToDate('');
-  };
+    setSearchText('')
+    setType('all')
+    setStatus('all')
+    setPriority('all')
+  }
 
   return (
     <Card>
@@ -147,8 +122,6 @@ const TaskFilter = observer(({ onFilterChange }: TaskFilterProps) => {
               </SelectContent>
             </Select>
           </div>
-
-          {/* 移除截止日期范围筛选器 */}
         </div>
 
         <Button
@@ -162,7 +135,7 @@ const TaskFilter = observer(({ onFilterChange }: TaskFilterProps) => {
         </Button>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default TaskFilter;
+export default TaskFilter

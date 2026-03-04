@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card';
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card'
 import { 
   PersonIcon, 
   CalendarIcon, 
   ClockIcon, 
   ChatBubbleIcon,
   InfoCircledIcon
-} from '@radix-ui/react-icons';
-import type { Relationship } from '../../../services/database';
-import { formatDate } from '../../../utils/formatters';
+} from '@radix-ui/react-icons'
+import type { Relationship } from '../../../services/database'
+import { formatDate } from '../../../utils/formatters'
 
 interface RelationshipDetailProps {
   relationship?: Relationship;
@@ -25,49 +25,49 @@ const RelationshipDetail = observer(({ relationship }: RelationshipDetailProps) 
           <p className="text-muted-foreground">选择一个联系人查看详情</p>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   const getDaysUntilNextContact = () => {
-    if (!relationship.nextContact) return null;
+    if (!relationship.nextContact) return null
     
-    const nextContact = new Date(relationship.nextContact);
-    const today = new Date();
-    const diffTime = nextContact.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const nextContact = new Date(relationship.nextContact)
+    const today = new Date()
+    const diffTime = nextContact.getTime() - today.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
-    return diffDays;
-  };
+    return diffDays
+  }
 
   const getContactStatus = () => {
-    const days = getDaysUntilNextContact();
+    const days = getDaysUntilNextContact()
     
-    if (days === null) return null;
+    if (days === null) return null
     
     if (days < 0) {
       return {
         text: `已逾期 ${Math.abs(days)} 天`,
         className: 'text-red-500'
-      };
+      }
     } else if (days === 0) {
       return {
         text: `今天应联系`,
         className: 'text-yellow-500'
-      };
+      }
     } else if (days <= 7) {
       return {
         text: `${days} 天后联系`,
         className: 'text-yellow-500'
-      };
+      }
     } else {
       return {
         text: `${days} 天后联系`,
         className: 'text-green-500'
-      };
+      }
     }
-  };
+  }
 
-  const contactStatus = getContactStatus();
+  const contactStatus = getContactStatus()
 
   return (
     <Card className="h-full">
@@ -126,7 +126,7 @@ const RelationshipDetail = observer(({ relationship }: RelationshipDetailProps) 
         </div>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default RelationshipDetail;
+export default RelationshipDetail

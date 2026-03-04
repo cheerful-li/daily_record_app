@@ -1,11 +1,9 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
-import Header from './Header';
-import MainContent from './MainContent';
-import Footer from './Footer';
-import MobileNav from './MobileNav';
-import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
-import { useUIStore } from '../../stores/StoreContext';
+import React from 'react'
+import { observer } from 'mobx-react-lite'
+import Header from './Header'
+import MainContent from './MainContent'
+import Footer from './Footer'
+import MobileNav from './MobileNav'
 // Navigation icons moved to Header component
 
 interface LayoutProps {
@@ -13,11 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = observer(({ children }) => {
-  const uiStore = useUIStore();
 
-  const handleTabChange = (value: string) => {
-    uiStore.setActiveModule(value);
-  };
   
   return (
     <div className="flex min-h-screen flex-col">
@@ -29,7 +23,7 @@ const Layout: React.FC<LayoutProps> = observer(({ children }) => {
       <Footer className="hidden md:block" />      
       <MobileNav />
     </div>
-  );
-});
+  )
+})
 
-export default Layout;
+export default Layout

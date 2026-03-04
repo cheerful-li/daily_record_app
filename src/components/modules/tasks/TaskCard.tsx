@@ -1,23 +1,22 @@
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react-lite"
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
-} from "../../ui/card";
-import { Button } from "../../ui/button";
+} from "../../ui/card"
+import { Button } from "../../ui/button"
 import {
   CheckCircledIcon,
   CrossCircledIcon,
   UpdateIcon,
-} from "@radix-ui/react-icons";
-import type { Task } from "../../../services/database";
+} from "@radix-ui/react-icons"
+import type { Task } from "../../../services/database"
 import {
   formatTaskStatus,
   formatTaskPriority,
-  formatSimpleDate,
-} from "../../../utils/formatters";
+} from "../../../utils/formatters"
 
 interface TaskCardProps {
   task: Task;
@@ -34,28 +33,28 @@ const TaskCard = observer(
     const getPriorityColor = (priority: string) => {
       switch (priority) {
         case "high":
-          return "text-red-500";
+          return "text-red-500"
         case "medium":
-          return "text-yellow-500";
+          return "text-yellow-500"
         case "low":
-          return "text-green-500";
+          return "text-green-500"
         default:
-          return "text-muted-foreground";
+          return "text-muted-foreground"
       }
-    };
+    }
 
     const getStatusColor = (status: string) => {
       switch (status) {
         case "completed":
-          return "bg-green-100 text-green-700";
+          return "bg-green-100 text-green-700"
         case "in-progress":
-          return "bg-blue-100 text-blue-700";
+          return "bg-blue-100 text-blue-700"
         case "pending":
-          return "bg-gray-100 text-gray-700";
+          return "bg-gray-100 text-gray-700"
         default:
-          return "bg-gray-100 text-gray-700";
+          return "bg-gray-100 text-gray-700"
       }
-    };
+    }
 
     const getTypeIndicator = (type: string) => {
       return type === "work" ? (
@@ -66,8 +65,8 @@ const TaskCard = observer(
         <span className="px-2 mr-1 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded-full shrink-0">
           成长
         </span>
-      );
-    };
+      )
+    }
 
     return (
       <Card className="w-full">
@@ -152,8 +151,8 @@ const TaskCard = observer(
           </div>
         </CardFooter>
       </Card>
-    );
+    )
   }
-);
+)
 
-export default TaskCard;
+export default TaskCard

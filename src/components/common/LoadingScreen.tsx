@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react"
 
 interface LoadingScreenProps {
   message?: string;
@@ -15,7 +15,7 @@ function LoadingScreen({ message = "应用正在加载中...", children }: Loadi
         {children}
       </div>
     </div>
-  );
+  )
 }
 
-export default LoadingScreen;
+export default LoadingScreen

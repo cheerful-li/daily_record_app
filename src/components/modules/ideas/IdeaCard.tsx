@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../ui/card';
-import { Button } from '../../ui/button';
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardContent, CardFooter } from '../../ui/card'
+import { Button } from '../../ui/button'
 import { 
   CalendarIcon, 
   Pencil1Icon, 
   TrashIcon,
   LightningBoltIcon
-} from '@radix-ui/react-icons';
-import type { Idea } from '../../../services/database';
-import { formatDate } from '../../../utils/formatters';
+} from '@radix-ui/react-icons'
+import type { Idea } from '../../../services/database'
+import { formatDate } from '../../../utils/formatters'
 
 interface IdeaCardProps {
   idea: Idea;
@@ -18,9 +18,9 @@ interface IdeaCardProps {
 
 const IdeaCard = observer(({ idea, onEdit, onDelete }: IdeaCardProps) => {
   const truncateContent = (text: string, maxLength = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
+  }
 
   return (
     <Card className="w-full">
@@ -67,7 +67,7 @@ const IdeaCard = observer(({ idea, onEdit, onDelete }: IdeaCardProps) => {
         </div>
       </CardFooter>
     </Card>
-  );
-});
+  )
+})
 
-export default IdeaCard;
+export default IdeaCard

@@ -1,52 +1,52 @@
-import { useEffect, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useTaskStore } from "../../stores/StoreContext";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useEffect, useState } from "react"
+import { observer } from "mobx-react-lite"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { useTaskStore } from "../../stores/StoreContext"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 
 interface TaskPieChartsProps {
   className?: string;
 }
 
 const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
-  const taskStore = useTaskStore();
+  const taskStore = useTaskStore()
   
-  const [statusData, setStatusData] = useState<Array<{ name: string; value: number; color: string }>>([]);
-  const [typeData, setTypeData] = useState<Array<{ name: string; value: number; color: string }>>([]);
+  const [statusData, setStatusData] = useState<Array<{ name: string; value: number; color: string }>>([])
+  const [typeData, setTypeData] = useState<Array<{ name: string; value: number; color: string }>>([])
   
   // 计算任务状态分布和类型分布数据
   useEffect(() => {
-    if (taskStore.tasks.length === 0) return;
+    if (taskStore.tasks.length === 0) return
     
     // 状态分布
     const statusCounts = {
       pending: taskStore.tasks.filter(task => task.status === "pending").length,
       inProgress: taskStore.tasks.filter(task => task.status === "in-progress").length,
       completed: taskStore.tasks.filter(task => task.status === "completed").length,
-    };
+    }
     
     const statusChartData = [
       { name: "未开始", value: statusCounts.pending, color: "#94a3b8" },
       { name: "进行中", value: statusCounts.inProgress, color: "#3b82f6" },
       { name: "已完成", value: statusCounts.completed, color: "#22c55e" },
-    ].filter(item => item.value > 0);
+    ].filter(item => item.value > 0)
     
-    setStatusData(statusChartData);
+    setStatusData(statusChartData)
     
     // 类型分布
     const typeCounts = {
       work: taskStore.tasks.filter(task => task.type === "work").length,
       growth: taskStore.tasks.filter(task => task.type === "growth").length,
-    };
+    }
     
     const typeChartData = [
       { name: "工作", value: typeCounts.work, color: "#8b5cf6" },
       { name: "成长", value: typeCounts.growth, color: "#f59e0b" },
-    ].filter(item => item.value > 0);
+    ].filter(item => item.value > 0)
     
-    setTypeData(typeChartData);
+    setTypeData(typeChartData)
     
-  }, [taskStore.tasks]);
+  }, [taskStore.tasks])
   
   return (
     <Card className={className}>
@@ -67,7 +67,7 @@ const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                       outerRadius={60}
                       fill="#8884d8"
                       dataKey="value"
@@ -76,7 +76,7 @@ const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}个任务`, '数量']} />
+                    <Tooltip formatter={(value: number | undefined) => [`${value ?? 0}个任务`, '数量']} />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
@@ -99,7 +99,7 @@ const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                       outerRadius={60}
                       fill="#8884d8"
                       dataKey="value"
@@ -108,7 +108,7 @@ const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}个任务`, '数量']} />
+                    <Tooltip formatter={(value: number | undefined) => [`${value ?? 0}个任务`, '数量']} />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
@@ -121,7 +121,7 @@ const TaskPieCharts = observer(({ className = "" }: TaskPieChartsProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default TaskPieCharts;
+export default TaskPieCharts

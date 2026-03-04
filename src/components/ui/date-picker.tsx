@@ -1,4 +1,3 @@
-import * as React from "react"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
 import { zhCN } from "date-fns/locale"

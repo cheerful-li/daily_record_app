@@ -1,9 +1,9 @@
-import { observer } from 'mobx-react-lite';
-import { Outlet } from 'react-router-dom';
-import Header from './Header';
-import MainContent from './MainContent';
-import Footer from './Footer';
-import MobileNav from './MobileNav';
+import { observer } from 'mobx-react-lite'
+import { Outlet } from 'react-router-dom'
+import Header from './Header'
+import MainContent from './MainContent'
+import Footer from './Footer'
+import MobileNav from './MobileNav'
 
 const AppLayout = observer(() => {
   return (
@@ -17,7 +17,7 @@ const AppLayout = observer(() => {
       <Footer className="hidden md:block" />
       <MobileNav />
     </div>
-  );
-});
+  )
+})
 
-export default AppLayout;
+export default AppLayout

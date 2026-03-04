@@ -1,28 +1,31 @@
-import { useState, useEffect, ReactNode } from "react";
-import PasswordDialog from "./PasswordDialog";
-import LoadingScreen from "../common/LoadingScreen";
+import { useState } from "react"
+import type { ReactNode } from "react"
+import PasswordDialog from "./PasswordDialog"
+import LoadingScreen from "../common/LoadingScreen"
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    // 检查本地存储中是否有认证令牌
-    const token = localStorage.getItem("auth_token");
-    setIsAuthenticated(!!token);
-    setChecking(false);
-  }, []);
+  // 使用useState的initializer函数初始化状态
+  // 在渲染时而非effect中初始化认证状态
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem("auth_token")
+    return !!token
+  })
+  
+  // 只要认证初始化完成就不再需要checking了
+  // 这里直接硬编码为false，避免使用useState和useEffect
+  // 只有在第一次渲染时需要checking状态
+  const checking = false
 
   const handleAuthenticated = () => {
-    setIsAuthenticated(true);
-  };
+    setIsAuthenticated(true)
+  }
 
   if (checking) {
-    return <LoadingScreen message="检查认证状态..." />;
+    return <LoadingScreen message="检查认证状态..." />
   }
 
   if (!isAuthenticated) {
@@ -33,10 +36,10 @@ function AuthProvider({ children }: AuthProviderProps) {
           onAuthenticated={handleAuthenticated}
         />
       </div>
-    );
+    )
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 }
 
-export default AuthProvider;
+export default AuthProvider

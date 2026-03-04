@@ -33,7 +33,11 @@
       "Bash(pnpm add recharts)",
       "WebFetch(domain:www.npmjs.com)",
       "Bash(pnpm add crypto-js @types/crypto-js)",
-      "Bash(pnpm add lucide-react)"
+      "Bash(pnpm add lucide-react)",
+      "Bash(npx eslint .)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc --version)",
+      "Bash(npx tsc --noEmit -p ./tsconfig.app.json)"
     ],
     "deny": []
   }

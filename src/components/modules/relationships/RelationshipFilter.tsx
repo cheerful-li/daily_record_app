@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Card, CardContent } from '../../ui/card';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useState, useCallback } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardContent } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
+import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 interface FilterOptions {
   searchText: string;
@@ -18,28 +18,11 @@ interface RelationshipFilterProps {
 }
 
 const RelationshipFilter = observer(({ onFilterChange, categories }: RelationshipFilterProps) => {
-  const [searchText, setSearchText] = useState('');
-  const [category, setCategory] = useState<string>('all');
-  const [contactStatus, setContactStatus] = useState<'all' | 'overdue' | 'upcoming' | 'no-date'>('all');
+  const [searchText, setSearchText] = useState('')
+  const [category, setCategory] = useState<string>('all')
+  const [contactStatus, setContactStatus] = useState<'all' | 'overdue' | 'upcoming' | 'no-date'>('all')
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchText = e.target.value;
-    setSearchText(newSearchText);
-    applyFilters(newSearchText, category, contactStatus);
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    applyFilters(searchText, value, contactStatus);
-  };
-
-  const handleContactStatusChange = (value: string) => {
-    const newStatus = value as 'all' | 'overdue' | 'upcoming' | 'no-date';
-    setContactStatus(newStatus);
-    applyFilters(searchText, category, newStatus);
-  };
-
-  const applyFilters = (
+  const applyFilters = useCallback((
     search: string,
     cat: string,
     status: 'all' | 'overdue' | 'upcoming' | 'no-date'
@@ -48,15 +31,32 @@ const RelationshipFilter = observer(({ onFilterChange, categories }: Relationshi
       searchText: search,
       category: cat,
       contactStatus: status,
-    });
-  };
+    })
+  }, [onFilterChange])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchText = e.target.value
+    setSearchText(newSearchText)
+    applyFilters(newSearchText, category, contactStatus)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value)
+    applyFilters(searchText, value, contactStatus)
+  }
+
+  const handleContactStatusChange = (value: string) => {
+    const newStatus = value as 'all' | 'overdue' | 'upcoming' | 'no-date'
+    setContactStatus(newStatus)
+    applyFilters(searchText, category, newStatus)
+  }
 
   const clearFilters = () => {
-    setSearchText('');
-    setCategory('all');
-    setContactStatus('all');
-    onFilterChange({ searchText: '', category: 'all', contactStatus: 'all' });
-  };
+    setSearchText('')
+    setCategory('all')
+    setContactStatus('all')
+    onFilterChange({ searchText: '', category: 'all', contactStatus: 'all' })
+  }
 
   return (
     <Card>
@@ -116,7 +116,7 @@ const RelationshipFilter = observer(({ onFilterChange, categories }: Relationshi
         </Button>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default RelationshipFilter;
+export default RelationshipFilter

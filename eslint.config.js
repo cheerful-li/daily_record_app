@@ -21,6 +21,8 @@ export default defineConfig([
     },
     rules: {
       'react-refresh/only-export-components': 0,
+      // 不要分号
+      'semi': ['warn', 'never'],
     },
   },
 ])

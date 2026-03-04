@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useHabitStore } from '../../../stores/StoreContext';
-import { Button } from '../../ui/button';
-import { PlusIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
-import type { Habit } from '../../../services/database';
-import HabitForm from './HabitForm';
+import { useState, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useHabitStore } from '../../../stores/StoreContext'
+import { Button } from '../../ui/button'
+import { PlusIcon, ArrowLeftIcon } from '@radix-ui/react-icons'
+import type { Habit } from '../../../services/database'
+import HabitForm from './HabitForm'
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../ui/table';
+} from '../../ui/table'
 import {
   Card,
   CardContent,
@@ -20,50 +20,50 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../../ui/card';
-import { formatFrequency } from '../../../utils/formatters';
-import { useNavigate } from 'react-router-dom';
+} from '../../ui/card'
+import { formatFrequency } from '../../../utils/formatters'
+import { useNavigate } from 'react-router-dom'
 
 const HabitSettings = observer(() => {
-  const habitStore = useHabitStore();
-  const navigate = useNavigate();
+  const habitStore = useHabitStore()
+  const navigate = useNavigate()
   
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>()
 
   useEffect(() => {
-    habitStore.loadHabits();
-  }, [habitStore]);
+    habitStore.loadHabits()
+  }, [habitStore])
 
   const handleAddHabit = async (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => {
-    await habitStore.addHabit(habit);
-    setIsAddDialogOpen(false);
-  };
+    await habitStore.addHabit(habit)
+    setIsAddDialogOpen(false)
+  }
 
   const handleEditHabit = async (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (selectedHabit?.id) {
-      await habitStore.updateHabit(selectedHabit.id, habit);
-      setIsEditDialogOpen(false);
+      await habitStore.updateHabit(selectedHabit.id, habit)
+      setIsEditDialogOpen(false)
     }
-  };
+  }
 
   const handleDeleteHabit = async (habitId: number | undefined) => {
     if (habitId) {
       if (confirm('确定要删除这个习惯吗？')) {
-        await habitStore.deleteHabit(habitId);
+        await habitStore.deleteHabit(habitId)
       }
     }
-  };
+  }
 
   const handleEditClick = (habit: Habit) => {
-    setSelectedHabit(habit);
-    setIsEditDialogOpen(true);
-  };
+    setSelectedHabit(habit)
+    setIsEditDialogOpen(true)
+  }
 
   const handleBackToDashboard = () => {
-    navigate('/app/habits');
-  };
+    navigate('/app/habits')
+  }
 
   return (
     <div className="container mx-auto py-4 sm:py-6 pb-20 md:pb-6">
@@ -227,7 +227,7 @@ const HabitSettings = observer(() => {
         isEditing={true}
       />
     </div>
-  );
-});
+  )
+})
 
-export default HabitSettings;
+export default HabitSettings

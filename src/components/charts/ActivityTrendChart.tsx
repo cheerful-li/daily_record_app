@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
-import { observer } from "mobx-react-lite";
+import { useEffect, useState } from "react"
+import { observer } from "mobx-react-lite"
 import {
   format,
   startOfMonth,
-  endOfMonth,
   eachDayOfInterval,
   subDays,
   startOfWeek,
   endOfWeek,
   isSameDay,
-} from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useLifeMomentStore, useIdeaStore } from "../../stores/StoreContext";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Button } from "../ui/button";
+} from "date-fns"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { useLifeMomentStore, useIdeaStore } from "../../stores/StoreContext"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { Button } from "../ui/button"
 
 interface ActivityTrendChartProps {
   className?: string;
@@ -22,93 +21,93 @@ interface ActivityTrendChartProps {
 type TimeRange = "week" | "month" | "quarter" | "year";
 
 const ActivityTrendChart = observer(({ className = "" }: ActivityTrendChartProps) => {
-  const lifeMomentStore = useLifeMomentStore();
-  const ideaStore = useIdeaStore();
+  const lifeMomentStore = useLifeMomentStore()
+  const ideaStore = useIdeaStore()
   
-  const [timeRange, setTimeRange] = useState<TimeRange>("month");
+  const [timeRange, setTimeRange] = useState<TimeRange>("month")
   const [chartData, setChartData] = useState<Array<{
     date: string;
     moments: number;
     ideas: number;
-  }>>([]);
+  }>>([])
   
   // 根据时间范围生成图表数据
   useEffect(() => {
     // 确定日期范围
-    const today = new Date();
-    let startDate: Date;
-    let endDate = today;
-    let dateFormat: string;
+    const today = new Date()
+    let startDate: Date
+    let endDate = today
+    let dateFormat: string
     
     switch (timeRange) {
       case "week":
-        startDate = startOfWeek(today);
-        endDate = endOfWeek(today);
-        dateFormat = "MM-dd";
-        break;
+        startDate = startOfWeek(today)
+        endDate = endOfWeek(today)
+        dateFormat = "MM-dd"
+        break
       case "month":
-        startDate = startOfMonth(today);
-        dateFormat = "MM-dd";
-        break;
+        startDate = startOfMonth(today)
+        dateFormat = "MM-dd"
+        break
       case "quarter":
-        startDate = subDays(today, 90);
-        dateFormat = "MM-dd";
-        break;
+        startDate = subDays(today, 90)
+        dateFormat = "MM-dd"
+        break
       case "year":
-        startDate = subDays(today, 365);
-        dateFormat = "yyyy-MM";
-        break;
+        startDate = subDays(today, 365)
+        dateFormat = "yyyy-MM"
+        break
       default:
-        startDate = startOfMonth(today);
-        dateFormat = "MM-dd";
+        startDate = startOfMonth(today)
+        dateFormat = "MM-dd"
     }
     
     // 获取日期范围内的每一天
-    const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
+    const dateRange = eachDayOfInterval({ start: startDate, end: endDate })
     
     // 按日期聚合生活点滴和灵感数据
     const data = dateRange.map(date => {
       // 当天的生活点滴数量
       const momentsCount = lifeMomentStore.lifeMoments.filter(moment => 
         isSameDay(new Date(moment.date), date)
-      ).length;
+      ).length
       
       // 当天的灵感数量
       const ideasCount = ideaStore.ideas.filter(idea => 
         isSameDay(new Date(idea.date), date)
-      ).length;
+      ).length
       
       return {
         date: format(date, dateFormat),
         moments: momentsCount,
         ideas: ideasCount,
-      };
-    });
+      }
+    })
     
     // 如果是年视图，按月聚合数据
     if (timeRange === "year") {
-      const monthlyData: Record<string, { moments: number; ideas: number }> = {};
+      const monthlyData: Record<string, { moments: number; ideas: number }> = {}
       
       data.forEach(day => {
         if (!monthlyData[day.date]) {
-          monthlyData[day.date] = { moments: 0, ideas: 0 };
+          monthlyData[day.date] = { moments: 0, ideas: 0 }
         }
-        monthlyData[day.date].moments += day.moments;
-        monthlyData[day.date].ideas += day.ideas;
-      });
+        monthlyData[day.date].moments += day.moments
+        monthlyData[day.date].ideas += day.ideas
+      })
       
       const aggregatedData = Object.entries(monthlyData).map(([date, counts]) => ({
         date,
         moments: counts.moments,
         ideas: counts.ideas,
-      }));
+      }))
       
-      setChartData(aggregatedData);
+      setChartData(aggregatedData)
     } else {
-      setChartData(data);
+      setChartData(data)
     }
     
-  }, [timeRange, lifeMomentStore.lifeMoments, ideaStore.ideas]);
+  }, [timeRange, lifeMomentStore.lifeMoments, ideaStore.ideas])
   
   return (
     <Card className={className}>
@@ -193,7 +192,7 @@ const ActivityTrendChart = observer(({ className = "" }: ActivityTrendChartProps
         </div>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default ActivityTrendChart;
+export default ActivityTrendChart

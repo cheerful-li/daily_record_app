@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Card, CardContent } from '../../ui/card';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useState, useCallback } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardContent } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
+import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 interface FilterOptions {
   searchText: string;
@@ -21,35 +21,12 @@ interface IdeaFilterProps {
 }
 
 const IdeaFilter = observer(({ onFilterChange, categories }: IdeaFilterProps) => {
-  const [searchText, setSearchText] = useState('');
-  const [category, setCategory] = useState<string>('all');
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
+  const [searchText, setSearchText] = useState('')
+  const [category, setCategory] = useState<string>('all')
+  const [fromDate, setFromDate] = useState<string>('')
+  const [toDate, setToDate] = useState<string>('')
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchText = e.target.value;
-    setSearchText(newSearchText);
-    applyFilters(newSearchText, category, fromDate, toDate);
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    applyFilters(searchText, value, fromDate, toDate);
-  };
-
-  const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFromDate = e.target.value;
-    setFromDate(newFromDate);
-    applyFilters(searchText, category, newFromDate, toDate);
-  };
-
-  const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newToDate = e.target.value;
-    setToDate(newToDate);
-    applyFilters(searchText, category, fromDate, newToDate);
-  };
-
-  const applyFilters = (
+  const applyFilters = useCallback((
     search: string,
     cat: string,
     from: string,
@@ -62,20 +39,43 @@ const IdeaFilter = observer(({ onFilterChange, categories }: IdeaFilterProps) =>
         from,
         to
       }
-    });
-  };
+    })
+  }, [onFilterChange])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchText = e.target.value
+    setSearchText(newSearchText)
+    applyFilters(newSearchText, category, fromDate, toDate)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value)
+    applyFilters(searchText, value, fromDate, toDate)
+  }
+
+  const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newFromDate = e.target.value
+    setFromDate(newFromDate)
+    applyFilters(searchText, category, newFromDate, toDate)
+  }
+
+  const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newToDate = e.target.value
+    setToDate(newToDate)
+    applyFilters(searchText, category, fromDate, newToDate)
+  }
 
   const clearFilters = () => {
-    setSearchText('');
-    setCategory('all');
-    setFromDate('');
-    setToDate('');
+    setSearchText('')
+    setCategory('all')
+    setFromDate('')
+    setToDate('')
     onFilterChange({
       searchText: '',
       category: 'all',
       dateRange: { from: '', to: '' }
-    });
-  };
+    })
+  }
 
   return (
     <Card>
@@ -138,7 +138,7 @@ const IdeaFilter = observer(({ onFilterChange, categories }: IdeaFilterProps) =>
         </Button>
       </CardContent>
     </Card>
-  );
-});
+  )
+})
 
-export default IdeaFilter;
+export default IdeaFilter

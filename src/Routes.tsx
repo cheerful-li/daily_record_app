@@ -1,17 +1,17 @@
-import { createHashRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom';
-import AuthProvider from './components/auth/AuthProvider';
-import DataInitializer from './data/DataInitializer';
-import AppLayout from './components/layout/AppLayout';
-import WelcomePage from './components/WelcomePage';
-import Habits from './components/modules/Habits';
-import LifeMoments from './components/modules/LifeMoments';
-import Tasks from './components/modules/Tasks';
-import Relationships from './components/modules/Relationships';
-import Ideas from './components/modules/Ideas';
-import Statistics from './components/modules/Statistics';
-import HabitSettings from './components/modules/habits/HabitSettings';
-import CheckInHistoryPage from './components/modules/habits/CheckInHistoryPage';
-import { Toaster } from './components/ui/sonner';
+import { createHashRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
+import AuthProvider from './components/auth/AuthProvider'
+import DataInitializer from './data/DataInitializer'
+import AppLayout from './components/layout/AppLayout'
+import WelcomePage from './components/WelcomePage'
+import Habits from './components/modules/Habits'
+import LifeMoments from './components/modules/LifeMoments'
+import Tasks from './components/modules/Tasks'
+import Relationships from './components/modules/Relationships'
+import Ideas from './components/modules/Ideas'
+import Statistics from './components/modules/Statistics'
+import HabitSettings from './components/modules/habits/HabitSettings'
+import CheckInHistoryPage from './components/modules/habits/CheckInHistoryPage'
+import { Toaster } from './components/ui/sonner'
 
 // 受保护路由包装器
 function ProtectedRoutes() {
@@ -22,7 +22,7 @@ function ProtectedRoutes() {
         <Toaster position="top-right" closeButton richColors />
       </DataInitializer>
     </AuthProvider>
-  );
+  )
 }
 
 const router = createHashRouter([
@@ -85,8 +85,8 @@ const router = createHashRouter([
       },
     ],
   },
-]);
+])
 
 export default function Routes() {
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} />
 }

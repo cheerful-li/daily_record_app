@@ -1,7 +1,7 @@
-import { observer } from 'mobx-react-lite';
-import type { Habit } from '../../../services/database';
-import HabitCard from './HabitCard';
-import { CheckCircledIcon } from '@radix-ui/react-icons';
+import { observer } from 'mobx-react-lite'
+import type { Habit } from '../../../services/database'
+import HabitCard from './HabitCard'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 interface HabitsListProps {
   habits: Habit[];
@@ -11,7 +11,7 @@ interface HabitsListProps {
 
 const HabitsList = observer(({ habits, onCheckIn, totalHabitsCount = 0 }: HabitsListProps) => {
   if (habits.length === 0) {
-    const hasHabits = totalHabitsCount > 0;
+    const hasHabits = totalHabitsCount > 0
     return (
       <div className="flex h-32 items-center justify-center rounded-md border border-dashed p-8 text-center">
         <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
@@ -33,7 +33,7 @@ const HabitsList = observer(({ habits, onCheckIn, totalHabitsCount = 0 }: Habits
           )}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -46,7 +46,7 @@ const HabitsList = observer(({ habits, onCheckIn, totalHabitsCount = 0 }: Habits
         />
       ))}
     </div>
-  );
-});
+  )
+})
 
-export default HabitsList;
+export default HabitsList

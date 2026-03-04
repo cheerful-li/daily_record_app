@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import HabitHeatMap from '../charts/HabitHeatMap';
-import TaskPieCharts from '../charts/TaskPieCharts';
-import ActivityTrendChart from '../charts/ActivityTrendChart';
-import RelationshipCharts from '../charts/RelationshipCharts';
+import { useState, useEffect, useCallback } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import HabitHeatMap from '../charts/HabitHeatMap'
+import TaskPieCharts from '../charts/TaskPieCharts'
+import ActivityTrendChart from '../charts/ActivityTrendChart'
+import RelationshipCharts from '../charts/RelationshipCharts'
 import { 
   useHabitStore, 
   useCheckInStore, 
@@ -12,16 +12,16 @@ import {
   useTaskStore, 
   useRelationshipStore, 
   useIdeaStore 
-} from '../../stores/StoreContext';
+} from '../../stores/StoreContext'
 
 const Statistics = observer(() => {
   // Access all stores
-  const habitStore = useHabitStore();
-  const checkInStore = useCheckInStore();
-  const lifeMomentStore = useLifeMomentStore();
-  const taskStore = useTaskStore();
-  const relationshipStore = useRelationshipStore();
-  const ideaStore = useIdeaStore();
+  const habitStore = useHabitStore()
+  const checkInStore = useCheckInStore()
+  const lifeMomentStore = useLifeMomentStore()
+  const taskStore = useTaskStore()
+  const relationshipStore = useRelationshipStore()
+  const ideaStore = useIdeaStore()
   
   // Statistics state
   const [habitStats, setHabitStats] = useState({
@@ -30,14 +30,14 @@ const Statistics = observer(() => {
     totalCheckIns: 0,
     completionRate: 0,
     streakDays: 0
-  });
+  })
   
   const [momentStats, setMomentStats] = useState({
     totalMoments: 0,
     uniqueTags: 0,
     thisWeek: 0,
     thisMonth: 0
-  });
+  })
   
   const [taskStats, setTaskStats] = useState({
     totalTasks: 0,
@@ -48,82 +48,53 @@ const Statistics = observer(() => {
     growthTasks: 0,
     overdueCount: 0,
     completionRate: 0
-  });
+  })
   
   const [relationshipStats, setRelationshipStats] = useState({
     totalRelationships: 0,
     needContactSoon: 0,
     contactedThisMonth: 0
-  });
+  })
   
   const [ideaStats, setIdeaStats] = useState({
     totalIdeas: 0,
     uniqueCategories: 0,
     thisWeek: 0,
     thisMonth: 0
-  });
+  })
 
-  // Calculate statistics when data changes
-  useEffect(() => {
-    loadStatistics();
-  }, [
-    habitStore.habits, 
-    checkInStore.checkIns, 
-    lifeMomentStore.lifeMoments, 
-    taskStore.tasks,
-    relationshipStore.relationships,
-    ideaStore.ideas
-  ]);
+  // 创建每个统计方法的memoized版本
+  const memoizedHabitStats = useCallback(() => {
+    // 内联计算函数，不再需要依赖calculateHabitStats
+    const activeHabits = habitStore.habits.filter(h => h.active).length
+    const totalCheckIns = checkInStore.checkIns.length
+    const completedCheckIns = checkInStore.checkIns.filter(c => c.status === 'completed').length
+    const completionRate = totalCheckIns > 0 ? Math.round((completedCheckIns / totalCheckIns) * 100) : 0
 
-  const loadStatistics = () => {
-    // Calculate habit statistics
-    calculateHabitStats();
-    
-    // Calculate life moment statistics
-    calculateMomentStats();
-    
-    // Calculate task statistics
-    calculateTaskStats();
-    
-    // Calculate relationship statistics
-    calculateRelationshipStats();
-    
-    // Calculate idea statistics
-    calculateIdeaStats();
-  };
-  
-  const calculateHabitStats = () => {
-    const activeHabits = habitStore.habits.filter(h => h.active).length;
-    const totalCheckIns = checkInStore.checkIns.length;
-    const completedCheckIns = checkInStore.checkIns.filter(c => c.status === 'completed').length;
-    const completionRate = totalCheckIns > 0 ? Math.round((completedCheckIns / totalCheckIns) * 100) : 0;
+    let streakDays = 0
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-    // Implement a simple streak calculation for illustration
-    // In a real app, this would be more sophisticated
-    let streakDays = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Sort check-ins by date in descending order
+    // 排序打卡记录
     const sortedCheckIns = [...checkInStore.checkIns]
       .filter(c => c.status === 'completed')
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     
     if (sortedCheckIns.length > 0) {
-      let currentDate = new Date(today);
+      let currentDate = new Date(today)
       
       for (const checkIn of sortedCheckIns) {
-        const checkInDate = new Date(checkIn.date);
-        checkInDate.setHours(0, 0, 0, 0);
+        const checkInDate = new Date(checkIn.date)
+        checkInDate.setHours(0, 0, 0, 0)
         
-        const diffDays = Math.floor((currentDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor((currentDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))
         
         if (diffDays <= 1) {
-          streakDays++;
-          currentDate = new Date(checkInDate);
-          currentDate.setDate(currentDate.getDate() - 1);
+          streakDays++
+          currentDate = new Date(checkInDate)
+          currentDate.setDate(currentDate.getDate() - 1)
         } else {
-          break;
+          break
         }
       }
     }
@@ -134,53 +105,53 @@ const Statistics = observer(() => {
       totalCheckIns,
       completionRate,
       streakDays
-    });
-  };
+    })
+  }, [habitStore.habits, checkInStore.checkIns])
   
-  const calculateMomentStats = () => {
-    const today = new Date();
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
+  const memoizedMomentStats = useCallback(() => {
+    // 内联计算函数，不再需要依赖calculateMomentStats
+    const today = new Date()
+    const startOfWeek = new Date(today)
+    startOfWeek.setDate(today.getDate() - today.getDay())
+    startOfWeek.setHours(0, 0, 0, 0)
     
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
     
-    const uniqueTags = new Set<string>();
+    const uniqueTags = new Set<string>()
     lifeMomentStore.lifeMoments.forEach(moment => {
-      moment.tags.forEach(tag => uniqueTags.add(tag));
-    });
+      moment.tags.forEach(tag => uniqueTags.add(tag))
+    })
     
     const thisWeekMoments = lifeMomentStore.lifeMoments.filter(
       moment => new Date(moment.date) >= startOfWeek
-    ).length;
+    ).length
     
     const thisMonthMoments = lifeMomentStore.lifeMoments.filter(
       moment => new Date(moment.date) >= startOfMonth
-    ).length;
+    ).length
     
     setMomentStats({
       totalMoments: lifeMomentStore.lifeMoments.length,
       uniqueTags: uniqueTags.size,
       thisWeek: thisWeekMoments,
       thisMonth: thisMonthMoments
-    });
-  };
+    })
+  }, [lifeMomentStore.lifeMoments])
   
-  const calculateTaskStats = () => {
-    const completedTasks = taskStore.tasks.filter(t => t.status === 'completed').length;
-    const pendingTasks = taskStore.tasks.filter(t => t.status === 'pending').length;
-    const inProgressTasks = taskStore.tasks.filter(t => t.status === 'in-progress').length;
-    const workTasks = taskStore.tasks.filter(t => t.type === 'work').length;
-    const growthTasks = taskStore.tasks.filter(t => t.type === 'growth').length;
+  const memoizedTaskStats = useCallback(() => {
+    // 内联计算函数，不再需要依赖calculateTaskStats
+    const completedTasks = taskStore.tasks.filter(t => t.status === 'completed').length
+    const pendingTasks = taskStore.tasks.filter(t => t.status === 'pending').length
+    const inProgressTasks = taskStore.tasks.filter(t => t.status === 'in-progress').length
+    const workTasks = taskStore.tasks.filter(t => t.type === 'work').length
+    const growthTasks = taskStore.tasks.filter(t => t.type === 'growth').length
     
-    const today = new Date();
-    const overdueTasks = taskStore.tasks.filter(
-      t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < today
-    ).length;
+    // 移除了截止日期功能，设置逾期任务为0
+    const overdueTasks = 0
     
     const completionRate = taskStore.tasks.length > 0 
       ? Math.round((completedTasks / taskStore.tasks.length) * 100) 
-      : 0;
+      : 0
     
     setTaskStats({
       totalTasks: taskStore.tasks.length,
@@ -191,59 +162,91 @@ const Statistics = observer(() => {
       growthTasks,
       overdueCount: overdueTasks,
       completionRate
-    });
-  };
+    })
+  }, [taskStore.tasks])
   
-  const calculateRelationshipStats = () => {
-    const today = new Date();
-    const sevenDaysLater = new Date(today);
-    sevenDaysLater.setDate(today.getDate() + 7);
+  const memoizedRelationshipStats = useCallback(() => {
+    // 内联计算函数，不再需要依赖calculateRelationshipStats
+    const today = new Date()
+    const sevenDaysLater = new Date(today)
+    sevenDaysLater.setDate(today.getDate() + 7)
     
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
     
     const needContactSoon = relationshipStore.relationships.filter(
       r => r.nextContact && new Date(r.nextContact) <= sevenDaysLater
-    ).length;
+    ).length
     
     const contactedThisMonth = relationshipStore.relationships.filter(
       r => r.lastContact && new Date(r.lastContact) >= startOfMonth
-    ).length;
+    ).length
     
     setRelationshipStats({
       totalRelationships: relationshipStore.relationships.length,
       needContactSoon,
       contactedThisMonth
-    });
-  };
+    })
+  }, [relationshipStore.relationships])
   
-  const calculateIdeaStats = () => {
-    const today = new Date();
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
+  const memoizedIdeaStats = useCallback(() => {
+    // 内联计算函数，不再需要依赖calculateIdeaStats
+    const today = new Date()
+    const startOfWeek = new Date(today)
+    startOfWeek.setDate(today.getDate() - today.getDay())
+    startOfWeek.setHours(0, 0, 0, 0)
     
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
     
-    const uniqueCategories = new Set<string>();
+    const uniqueCategories = new Set<string>()
     ideaStore.ideas.forEach(idea => {
-      uniqueCategories.add(idea.category);
-    });
+      uniqueCategories.add(idea.category)
+    })
     
     const thisWeekIdeas = ideaStore.ideas.filter(
       idea => new Date(idea.date) >= startOfWeek
-    ).length;
+    ).length
     
     const thisMonthIdeas = ideaStore.ideas.filter(
       idea => new Date(idea.date) >= startOfMonth
-    ).length;
+    ).length
     
     setIdeaStats({
       totalIdeas: ideaStore.ideas.length,
       uniqueCategories: uniqueCategories.size,
       thisWeek: thisWeekIdeas,
       thisMonth: thisMonthIdeas
-    });
-  };
+    })
+  }, [ideaStore.ideas])
+
+  const loadStatistics = useCallback(() => {
+    // 调用所有统计方法
+    memoizedHabitStats()
+    memoizedMomentStats()
+    memoizedTaskStats()
+    memoizedRelationshipStats()
+    memoizedIdeaStats()
+  }, [
+    memoizedHabitStats,
+    memoizedMomentStats, 
+    memoizedTaskStats,
+    memoizedRelationshipStats,
+    memoizedIdeaStats
+  ])
+  
+  // Calculate statistics when data changes
+  useEffect(() => {
+    loadStatistics()
+  }, [
+    habitStore.habits, 
+    checkInStore.checkIns, 
+    lifeMomentStore.lifeMoments, 
+    taskStore.tasks,
+    relationshipStore.relationships,
+    ideaStore.ideas,
+    loadStatistics
+  ])
+  
+  // 原来的计算函数已经内联到各自的useCallback中，不再需要独立定义
 
   return (
     <div className="container mx-auto pb-20 md:pb-0">
@@ -389,7 +392,7 @@ const Statistics = observer(() => {
         <RelationshipCharts className="w-full" />
       </div>
     </div>
-  );
-});
+  )
+})
 
-export default Statistics;
+export default Statistics

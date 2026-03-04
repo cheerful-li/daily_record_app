@@ -1,19 +1,19 @@
-import { useState, useRef, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { useIdeaStore } from "../../../stores/StoreContext";
-import { Card, CardContent } from "../../ui/card";
-import { Textarea } from "../../ui/textarea";
-import { Input } from "../../ui/input";
-import { Button } from "../../ui/button";
+import { useState, useRef } from "react"
+import { observer } from "mobx-react-lite"
+import { useIdeaStore } from "../../../stores/StoreContext"
+import { Card, CardContent } from "../../ui/card"
+import { Textarea } from "../../ui/textarea"
+import { Input } from "../../ui/input"
+import { Button } from "../../ui/button"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { PlusIcon, Cross2Icon } from "@radix-ui/react-icons";
-import type { Idea } from "../../../services/database";
+} from "../../ui/select"
+import { PlusIcon, Cross2Icon } from "@radix-ui/react-icons"
+import type { Idea } from "../../../services/database"
 
 interface QuickIdeaInputProps {
   onSubmit: (idea: Omit<Idea, "id" | "createdAt" | "updatedAt">) => void;
@@ -22,48 +22,48 @@ interface QuickIdeaInputProps {
 
 const QuickIdeaInput = observer(
   ({ onSubmit, categories }: QuickIdeaInputProps) => {
-    const ideaStore = useIdeaStore();
-    const [content, setContent] = useState("");
+    const ideaStore = useIdeaStore()
+    const [content, setContent] = useState("")
     const [category, setCategory] = useState<string>(
       ideaStore.lastUsedCategory ||
         (categories.length > 0 ? categories[0] : "灵感")
-    );
-    const [newCategory, setNewCategory] = useState<string>("");
-    const [useNewCategory, setUseNewCategory] = useState<boolean>(false);
-    const inputRef = useRef<HTMLInputElement>(null);
+    )
+    const [newCategory, setNewCategory] = useState<string>("")
+    const [useNewCategory, setUseNewCategory] = useState<boolean>(false)
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const handleCategoryChange = (value: string) => {
       if (value === "__new__") {
-        setUseNewCategory(true);
-        setTimeout(() => inputRef.current?.focus(), 50);
+        setUseNewCategory(true)
+        setTimeout(() => inputRef.current?.focus(), 50)
       } else {
-        setCategory(value);
+        setCategory(value)
       }
-    };
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
 
-      if (content.trim() === "") return;
+      if (content.trim() === "") return
 
       // 使用新分类或现有分类
       const selectedCategory =
-        useNewCategory && newCategory.trim() ? newCategory.trim() : category;
+        useNewCategory && newCategory.trim() ? newCategory.trim() : category
 
       onSubmit({
         content,
         date: new Date(),
         category: selectedCategory,
         tags: [],
-      });
+      })
 
       // Reset form
-      setContent("");
+      setContent("")
       if (useNewCategory) {
-        setUseNewCategory(false);
-        setNewCategory("");
+        setUseNewCategory(false)
+        setNewCategory("")
       }
-    };
+    }
 
     return (
       <Card>
@@ -150,8 +150,8 @@ const QuickIdeaInput = observer(
           </form>
         </CardContent>
       </Card>
-    );
+    )
   }
-);
+)
 
-export default QuickIdeaInput;
+export default QuickIdeaInput

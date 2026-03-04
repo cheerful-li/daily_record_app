@@ -1,13 +1,13 @@
-import { observer } from 'mobx-react-lite';
-import { HeartFilledIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
-import { cn } from '../../lib/utils';
+import { observer } from 'mobx-react-lite'
+import { HeartFilledIcon, GitHubLogoIcon } from '@radix-ui/react-icons'
+import { cn } from '../../lib/utils'
 
 interface FooterProps {
   className?: string;
 }
 
 const Footer = observer(({ className }: FooterProps) => {
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear()
 
   return (
     <footer className={cn("border-t py-6 md:py-0 bg-gradient-to-r from-[color:var(--primary)/0.05] to-[color:var(--accent)/0.05] shadow-inner", className)}>
@@ -30,7 +30,7 @@ const Footer = observer(({ className }: FooterProps) => {
         </div>
       </div>
     </footer>
-  );
-});
+  )
+})
 
-export default Footer;
+export default Footer

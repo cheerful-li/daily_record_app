@@ -1,6 +1,6 @@
-import { observer } from 'mobx-react-lite';
-import type { Task } from '../../../services/database';
-import TaskCard from './TaskCard';
+import { observer } from 'mobx-react-lite'
+import type { Task } from '../../../services/database'
+import TaskCard from './TaskCard'
 
 interface TasksListProps {
   tasks: Task[];
@@ -20,7 +20,7 @@ const TasksList = observer(({ tasks, onEdit, onDelete, onStatusChange }: TasksLi
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -35,7 +35,7 @@ const TasksList = observer(({ tasks, onEdit, onDelete, onStatusChange }: TasksLi
         />
       ))}
     </div>
-  );
-});
+  )
+})
 
-export default TasksList;
+export default TasksList

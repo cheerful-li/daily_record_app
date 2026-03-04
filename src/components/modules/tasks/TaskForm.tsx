@@ -1,26 +1,25 @@
-import { useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
+import { useState, useEffect } from "react"
+import { observer } from "mobx-react-lite"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../ui/dialog";
-import { Input } from "../../ui/input";
-import { Textarea } from "../../ui/textarea";
+} from "../../ui/dialog"
+import { Input } from "../../ui/input"
+import { Textarea } from "../../ui/textarea"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { Button } from "../../ui/button";
+} from "../../ui/select"
+import { Button } from "../../ui/button"
 // 移除进度和日期相关组件导入
-import { format } from "date-fns";
-import { showSuccess, showError } from "../../../lib/toast";
-import type { Task } from "../../../services/database";
+import { showSuccess, showError } from "../../../lib/toast"
+import type { Task } from "../../../services/database"
 
 interface TaskFormProps {
   open: boolean;
@@ -38,39 +37,39 @@ const TaskForm = observer(
     initialData,
     isEditing = false,
   }: TaskFormProps) => {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [type, setType] = useState<"work" | "growth">("work");
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
+    const [type, setType] = useState<"work" | "growth">("work")
     const [status, setStatus] = useState<
       "pending" | "in-progress" | "completed"
-    >("pending");
+    >("pending")
     const [priority, setPriority] = useState<"low" | "medium" | "high">(
       "medium"
-    );
+    )
     // 移除进度和截止日期
 
     // Reset form when dialog opens with initialData
     useEffect(() => {
       if (initialData) {
-        setTitle(initialData.title);
-        setDescription(initialData.description);
-        setType(initialData.type);
-        setStatus(initialData.status);
-        setPriority(initialData.priority);
+        setTitle(initialData.title)
+        setDescription(initialData.description)
+        setType(initialData.type)
+        setStatus(initialData.status)
+        setPriority(initialData.priority)
         // 移除进度和截止日期设置
       } else {
         // Reset form for a new task
-        setTitle("");
-        setDescription("");
-        setType("work");
-        setStatus("pending");
-        setPriority("medium");
+        setTitle("")
+        setDescription("")
+        setType("work")
+        setStatus("pending")
+        setPriority("medium")
         // 移除进度和截止日期重置
       }
-    }, [initialData, open]);
+    }, [initialData, open])
 
     const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
 
       try {
         const taskData: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
@@ -79,37 +78,37 @@ const TaskForm = observer(
           type,
           status,
           priority,
-        };
+        }
 
         // 移除截止日期保存
 
-        onSubmit(taskData);
-        showSuccess(isEditing ? "任务更新成功!" : "新任务添加成功!");
-        onClose();
+        onSubmit(taskData)
+        showSuccess(isEditing ? "任务更新成功!" : "新任务添加成功!")
+        onClose()
       } catch (error) {
-        console.error("Error submitting task:", error);
-        showError(isEditing ? "任务更新失败，请重试" : "任务创建失败，请重试");
+        console.error("Error submitting task:", error)
+        showError(isEditing ? "任务更新失败，请重试" : "任务创建失败，请重试")
       }
-    };
+    }
 
     const handleStatusChange = (value: string) => {
-      const newStatus = value as "pending" | "in-progress" | "completed";
-      setStatus(newStatus);
+      const newStatus = value as "pending" | "in-progress" | "completed"
+      setStatus(newStatus)
       // 移除进度更新逻辑
-    };
+    }
 
     const getPriorityColor = () => {
       switch (priority) {
         case "high":
-          return "text-red-500";
+          return "text-red-500"
         case "medium":
-          return "text-yellow-500";
+          return "text-yellow-500"
         case "low":
-          return "text-green-500";
+          return "text-green-500"
         default:
-          return "";
+          return ""
       }
-    };
+    }
 
     return (
       <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -251,8 +250,8 @@ const TaskForm = observer(
           </form>
         </DialogContent>
       </Dialog>
-    );
+    )
   }
-);
+)
 
-export default TaskForm;
+export default TaskForm

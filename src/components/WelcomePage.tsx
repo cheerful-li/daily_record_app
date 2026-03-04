@@ -1,16 +1,16 @@
-import { useNavigate } from "react-router-dom";
-import { StoreProvider } from "../stores/StoreContext";
-import { Toaster } from "../components/ui/sonner";
-import { showSuccess } from "../lib/toast";
+import { useNavigate } from "react-router-dom"
+import { StoreProvider } from "../stores/StoreContext"
+import { Toaster } from "../components/ui/sonner"
+import { showSuccess } from "../lib/toast"
 
 function WelcomePage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleStart = async () => {
     // 直接导航到主应用，不添加示例数据
-    navigate("/app/habits");
-    showSuccess("欢迎使用Daily Record个人管理系统！");
-  };
+    navigate("/app/habits")
+    showSuccess("欢迎使用Daily Record个人管理系统！")
+  }
 
   return (
     <StoreProvider>
@@ -60,7 +60,7 @@ function WelcomePage() {
         </div>
       </div>
     </StoreProvider>
-  );
+  )
 }
 
-export default WelcomePage;
+export default WelcomePage

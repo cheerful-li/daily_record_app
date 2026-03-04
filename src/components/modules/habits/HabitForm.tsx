@@ -1,26 +1,26 @@
-import { useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
+import { useState, useEffect } from "react"
+import { observer } from "mobx-react-lite"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../ui/dialog";
-import { Input } from "../../ui/input";
-import { Textarea } from "../../ui/textarea";
+} from "../../ui/dialog"
+import { Input } from "../../ui/input"
+import { Textarea } from "../../ui/textarea"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { Button } from "../../ui/button";
-import { Checkbox } from "../../ui/checkbox";
-import { DatePicker } from "../../ui/date-picker";
-import { showSuccess, showError } from "../../../lib/toast";
-import type { Habit } from "../../../services/database";
+} from "../../ui/select"
+import { Button } from "../../ui/button"
+import { Checkbox } from "../../ui/checkbox"
+import { DatePicker } from "../../ui/date-picker"
+import { showSuccess, showError } from "../../../lib/toast"
+import type { Habit } from "../../../services/database"
 
 interface HabitFormProps {
   open: boolean;
@@ -38,48 +38,48 @@ const HabitForm = observer(
     initialData,
     isEditing = false,
   }: HabitFormProps) => {
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
+    const [name, setName] = useState("")
+    const [description, setDescription] = useState("")
     const [frequency, setFrequency] = useState<"daily" | "weekly" | "monthly">(
       "daily"
-    );
-    const [active, setActive] = useState(true);
-    const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+    )
+    const [active, setActive] = useState(true)
+    const [startDate, setStartDate] = useState<Date | undefined>(new Date())
 
     // Reset form when dialog opens with initialData
     useEffect(() => {
       if (initialData) {
-        setName(initialData.name);
-        setDescription(initialData.description);
-        setFrequency(initialData.frequency);
-        setActive(initialData.active);
-        setStartDate(new Date()); // You might want to store and retrieve this from the habit
+        setName(initialData.name)
+        setDescription(initialData.description)
+        setFrequency(initialData.frequency)
+        setActive(initialData.active)
+        setStartDate(new Date()) // You might want to store and retrieve this from the habit
       } else {
         // Reset form for a new habit
-        setName("");
-        setDescription("");
-        setFrequency("daily");
-        setActive(true);
-        setStartDate(new Date());
+        setName("")
+        setDescription("")
+        setFrequency("daily")
+        setActive(true)
+        setStartDate(new Date())
       }
-    }, [initialData, open]);
+    }, [initialData, open])
 
     const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
       try {
         onSubmit({
           name,
           description,
           frequency,
           active,
-        });
-        showSuccess(isEditing ? "习惯更新成功!" : "新习惯添加成功!");
-        onClose();
+        })
+        showSuccess(isEditing ? "习惯更新成功!" : "新习惯添加成功!")
+        onClose()
       } catch (error) {
-        console.error("Error submitting habit:", error);
-        showError(isEditing ? "习惯更新失败，请重试" : "习惯创建失败，请重试");
+        console.error("Error submitting habit:", error)
+        showError(isEditing ? "习惯更新失败，请重试" : "习惯创建失败，请重试")
       }
-    };
+    }
 
     return (
       <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -201,8 +201,8 @@ const HabitForm = observer(
           </form>
         </DialogContent>
       </Dialog>
-    );
+    )
   }
-);
+)
 
-export default HabitForm;
+export default HabitForm

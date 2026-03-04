@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
-import { Input } from '../../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { Textarea } from '../../ui/textarea';
-import { Button } from '../../ui/button';
-import { DatePicker } from '../../ui/date-picker';
-import type { Relationship } from '../../../services/database';
+import { useState, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog'
+import { Input } from '../../ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
+import { Textarea } from '../../ui/textarea'
+import { Button } from '../../ui/button'
+import { DatePicker } from '../../ui/date-picker'
+import type { Relationship } from '../../../services/database'
 
 interface RelationshipFormProps {
   open: boolean;
@@ -23,52 +23,52 @@ const RelationshipForm = observer(({
   initialData, 
   isEditing = false 
 }: RelationshipFormProps) => {
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState('朋友');
-  const [lastContact, setLastContact] = useState<Date | undefined>(undefined);
-  const [nextContact, setNextContact] = useState<Date | undefined>(undefined);
-  const [notes, setNotes] = useState('');
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('朋友')
+  const [lastContact, setLastContact] = useState<Date | undefined>(undefined)
+  const [nextContact, setNextContact] = useState<Date | undefined>(undefined)
+  const [notes, setNotes] = useState('')
   
-  const categories = ['家人', '朋友', '同事', '同学', '熟人', '其他'];
+  const categories = ['家人', '朋友', '同事', '同学', '熟人', '其他']
 
   // Reset form when dialog opens with initialData
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name);
-      setCategory(initialData.category);
-      setLastContact(initialData.lastContact ? new Date(initialData.lastContact) : undefined);
-      setNextContact(initialData.nextContact ? new Date(initialData.nextContact) : undefined);
-      setNotes(initialData.notes);
+      setName(initialData.name)
+      setCategory(initialData.category)
+      setLastContact(initialData.lastContact ? new Date(initialData.lastContact) : undefined)
+      setNextContact(initialData.nextContact ? new Date(initialData.nextContact) : undefined)
+      setNotes(initialData.notes)
     } else {
       // Reset form for new relationship
-      setName('');
-      setCategory('朋友');
-      setLastContact(undefined);
-      setNextContact(undefined);
-      setNotes('');
+      setName('')
+      setCategory('朋友')
+      setLastContact(undefined)
+      setNextContact(undefined)
+      setNotes('')
     }
-  }, [initialData, open]);
+  }, [initialData, open])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     
     const relationshipData: Omit<Relationship, 'id' | 'createdAt' | 'updatedAt'> = {
       name,
       category,
       notes,
-    };
+    }
     
     if (lastContact) {
-      relationshipData.lastContact = lastContact;
+      relationshipData.lastContact = lastContact
     }
     
     if (nextContact) {
-      relationshipData.nextContact = nextContact;
+      relationshipData.nextContact = nextContact
     }
     
-    onSubmit(relationshipData);
-    onClose();
-  };
+    onSubmit(relationshipData)
+    onClose()
+  }
 
 
   return (
@@ -142,7 +142,7 @@ const RelationshipForm = observer(({
         </form>
       </DialogContent>
     </Dialog>
-  );
-});
+  )
+})
 
-export default RelationshipForm;
+export default RelationshipForm
