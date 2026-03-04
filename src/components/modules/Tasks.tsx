@@ -1,6 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTaskStore } from '../../stores/StoreContext'
+import { useConfirmDialog } from '../common/ConfirmDialog'
+import type { TaskFilterOptions } from '../../stores/TaskStore'
 import { Button } from '../ui/button'
 import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons'
 import type { Task } from '../../services/database'
@@ -9,78 +11,24 @@ import TaskForm from './tasks/TaskForm'
 import TaskFilter from './tasks/TaskFilter'
 import TaskStats from './tasks/TaskStats'
 
-interface FilterOptions {
-  searchText: string;
-  type: 'all' | 'work' | 'growth';
-  status: 'all' | 'pending' | 'in-progress' | 'completed';
-  priority: 'all' | 'high' | 'medium' | 'low';
-}
+// 使用从 TaskStore 导入的 TaskFilterOptions 类型
 
 const Tasks = observer(() => {
   const taskStore = useTaskStore()
+  const { confirm, dialog } = useConfirmDialog()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | undefined>()
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    searchText: '',
-    type: 'all',
-    status: 'all',
-    priority: 'all',
-  })
+  // 不再需要在组件维护过滤状态
   const [showFilters, setShowFilters] = useState(false) // 控制筛选面板的显示/隐藏
 
   useEffect(() => {
     taskStore.loadTasks()
   }, [taskStore])
 
-  // 使用useMemo计算过滤后的任务列表
-  const filteredTasks = useMemo(() => {
-    let filtered = [...taskStore.tasks]
-
-    // Filter by search text (in title or description)
-    if (filterOptions.searchText) {
-      const searchLower = filterOptions.searchText.toLowerCase()
-      filtered = filtered.filter(
-        task =>
-          task.title.toLowerCase().includes(searchLower) ||
-          task.description.toLowerCase().includes(searchLower)
-      )
-    }
-
-    // Filter by type
-    if (filterOptions.type !== 'all') {
-      filtered = filtered.filter(task => task.type === filterOptions.type)
-    }
-
-    // Filter by status
-    if (filterOptions.status !== 'all') {
-      filtered = filtered.filter(task => task.status === filterOptions.status)
-    }
-
-    // Filter by priority
-    if (filterOptions.priority !== 'all') {
-      filtered = filtered.filter(task => task.priority === filterOptions.priority)
-    }
-
-    // 排序逻辑
-    return filtered.sort((a, b) => {
-      // 1. 首先按状态排序: in-progress > pending > completed
-      const statusOrder = { 'in-progress': 0, 'pending': 1, 'completed': 2 }
-      const statusDiff = statusOrder[a.status] - statusOrder[b.status]
-      if (statusDiff !== 0) return statusDiff
-      
-      // 2. 然后按优先级排序（high -> medium -> low）
-      const priorityOrder = { high: 0, medium: 1, low: 2 }
-      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority]
-      if (priorityDiff !== 0) return priorityDiff
-      
-      // 3. 最后按创建时间从新到旧排序
-      const timeA = new Date(a.createdAt).getTime()
-      const timeB = new Date(b.createdAt).getTime()
-      return timeB - timeA // 降序排列（从新到旧）
-    })
-  }, [taskStore.tasks, filterOptions])
+  // 直接使用 taskStore 的 computed 属性
+  const filteredTasks = taskStore.filteredTasks
 
   const handleAddTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     await taskStore.addTask(task)
@@ -94,9 +42,16 @@ const Tasks = observer(() => {
 
   const handleDeleteTask = async (taskId: number | undefined) => {
     if (taskId) {
-      if (confirm('确定要删除这个任务吗？')) {
-        await taskStore.deleteTask(taskId)
-      }
+      confirm({
+        title: '删除任务',
+        description: '确定要删除这个任务吗？此操作无法撤销。',
+        confirmText: '删除',
+        cancelText: '取消',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await taskStore.deleteTask(taskId)
+        },
+      })
     }
   }
 
@@ -111,8 +66,9 @@ const Tasks = observer(() => {
     }
   }
 
-  const handleFilterChange = (options: FilterOptions) => {
-    setFilterOptions(options)
+  const handleFilterChange = (options: TaskFilterOptions) => {
+    // 更新 taskStore 中的过滤选项
+    taskStore.setFilterOptions(options)
   }
   
   const toggleFilters = () => {
@@ -193,6 +149,9 @@ const Tasks = observer(() => {
         initialData={selectedTask}
         isEditing={true}
       />
+      
+      {/* 确认对话框 */}
+      {dialog}
     </div>
   )
 })

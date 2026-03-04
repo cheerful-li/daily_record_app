@@ -1,15 +1,34 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction, computed, observable } from 'mobx'
 import type { Task } from '../services/database'
 import { getById, queryByIndex } from '../services/database'
 import { add, update, remove, getAll } from '../services/enhancedDatabase'
+
+// 定义过滤选项接口
+export interface TaskFilterOptions {
+  searchText?: string;
+  type?: 'all' | 'work' | 'growth';
+  status?: 'all' | 'pending' | 'in-progress' | 'completed';
+  priority?: 'all' | 'high' | 'medium' | 'low';
+}
 
 class TaskStore {
   tasks: Task[] = []
   loading = false
   error: Error | null = null
+  
+  // 当前过滤选项
+  filterOptions: TaskFilterOptions = observable({
+    searchText: '',
+    type: 'all',
+    status: 'all',
+    priority: 'all'
+  })
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      // 确保computed属性被正确识别
+      filteredTasks: computed
+    })
     this.loadTasks()
   }
 
@@ -68,7 +87,7 @@ class TaskStore {
       runInAction(() => {
         const index = this.tasks.findIndex(t => t.id === id)
         if (index !== -1 && updatedTask) {
-          // 直接替换数组中的元素
+          // 替换整个对象引用，确保 MobX 可以检测到变化
           this.tasks[index] = updatedTask as Task
         }
         this.loading = false
@@ -182,45 +201,78 @@ class TaskStore {
     }
   }
 
-  // Filter tasks in memory
+  // 设置过滤选项方法
+  setFilterOptions(options: Partial<TaskFilterOptions>) {
+    Object.assign(this.filterOptions, options)
+  }
+
+  // 使用computed计算过滤后的任务列表
+  get filteredTasks() {
+    return computed(() => {
+      let filtered = [...this.tasks]
+
+      // Filter by search text (in title or description)
+      if (this.filterOptions.searchText) {
+        const searchLower = this.filterOptions.searchText.toLowerCase()
+        filtered = filtered.filter(
+          task =>
+            task.title.toLowerCase().includes(searchLower) ||
+            task.description.toLowerCase().includes(searchLower)
+        )
+      }
+
+      // Filter by type
+      if (this.filterOptions.type !== 'all') {
+        filtered = filtered.filter(task => task.type === this.filterOptions.type)
+      }
+
+      // Filter by status
+      if (this.filterOptions.status !== 'all') {
+        filtered = filtered.filter(task => task.status === this.filterOptions.status)
+      }
+
+      // Filter by priority
+      if (this.filterOptions.priority !== 'all') {
+        filtered = filtered.filter(task => task.priority === this.filterOptions.priority)
+      }
+
+      // 排序逻辑
+      return filtered.sort((a, b) => {
+        // 1. 首先按状态排序: in-progress > pending > completed
+        const statusOrder = { 'in-progress': 0, 'pending': 1, 'completed': 2 }
+        const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+        if (statusDiff !== 0) return statusDiff
+        
+        // 2. 然后按优先级排序（high -> medium -> low）
+        const priorityOrder = { high: 0, medium: 1, low: 2 }
+        const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority]
+        if (priorityDiff !== 0) return priorityDiff
+        
+        // 3. 最后按创建时间从新到旧排序
+        const timeA = new Date(a.createdAt).getTime()
+        const timeB = new Date(b.createdAt).getTime()
+        return timeB - timeA // 降序排列（从新到旧）
+      })
+    }).get()
+  }
+  
+  // 旧的过滤方法（保留向后兼容）
   getFilteredTasks(filter: {
     type?: Task['type'];
     status?: Task['status'];
     priority?: Task['priority'];
     title?: string;
-    fromDueDate?: Date;
-    toDueDate?: Date;
   }) {
-    return this.tasks.filter(task => {
-      let match = true
-      
-      if (filter.type !== undefined) {
-        match = match && task.type === filter.type
-      }
-      
-      if (filter.status !== undefined) {
-        match = match && task.status === filter.status
-      }
-      
-      if (filter.priority !== undefined) {
-        match = match && task.priority === filter.priority
-      }
-      
-      if (filter.title !== undefined && filter.title.trim() !== '') {
-        match = match && task.title.toLowerCase().includes(filter.title.toLowerCase())
-      }
-      
-      // 移除了截止日期过滤功能
-      // if (filter.fromDueDate !== undefined && task.dueDate) {
-      //   match = match && task.dueDate >= filter.fromDueDate
-      // }
-      // 
-      // if (filter.toDueDate !== undefined && task.dueDate) {
-      //   match = match && task.dueDate <= filter.toDueDate
-      // }
-      
-      return match
+    // 设置过滤选项
+    this.setFilterOptions({
+      searchText: filter.title || '',
+      type: filter.type ? filter.type : 'all',
+      status: filter.status ? filter.status : 'all',
+      priority: filter.priority ? filter.priority : 'all'
     })
+    
+    // 返回计算后的结果
+    return this.filteredTasks
   }
 }
 

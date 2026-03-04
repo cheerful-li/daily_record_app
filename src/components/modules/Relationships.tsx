@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRelationshipStore } from '../../stores/StoreContext'
+import { useConfirmDialog } from '../common/ConfirmDialog'
 import { Button } from '../ui/button'
 import { PlusIcon, MixerHorizontalIcon } from '@radix-ui/react-icons'
 import type { Relationship } from '../../services/database'
@@ -18,6 +19,7 @@ interface FilterOptions {
 
 const Relationships = observer(() => {
   const relationshipStore = useRelationshipStore()
+  const { confirm, dialog } = useConfirmDialog()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -124,12 +126,19 @@ const Relationships = observer(() => {
 
   const handleDeleteRelationship = async (relationshipId: number | undefined) => {
     if (relationshipId) {
-      if (confirm('确定要删除这个联系人吗？')) {
-        await relationshipStore.deleteRelationship(relationshipId)
-        if (selectedRelationship?.id === relationshipId) {
-          setSelectedRelationship(undefined)
-        }
-      }
+      confirm({
+        title: '删除联系人',
+        description: '确定要删除这个联系人吗？此操作无法撤销。',
+        confirmText: '删除',
+        cancelText: '取消',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await relationshipStore.deleteRelationship(relationshipId)
+          if (selectedRelationship?.id === relationshipId) {
+            setSelectedRelationship(undefined)
+          }
+        },
+      })
     }
   }
 
@@ -272,6 +281,7 @@ const Relationships = observer(() => {
         onSubmit={handleContactSubmit}
         relationship={selectedRelationship}
       />
+      {dialog}
     </div>
   )
 })

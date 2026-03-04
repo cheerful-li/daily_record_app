@@ -104,7 +104,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    ```bash
    npx shadcn@latest add <component-name>
    ```
-   不要自己创建shadcn组件文件
+   不要自己创建shadcn/ui组件文件，而是使用npx shadcn@latest add <component-name>添加
 
 3. **数据同步**:
    - 应用启动时会从云端拉取最新数据

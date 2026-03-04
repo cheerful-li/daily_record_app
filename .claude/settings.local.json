@@ -38,7 +38,8 @@
       "Bash(npx eslint:*)",
       "Bash(npx tsc --version)",
       "Bash(npx tsc --noEmit -p ./tsconfig.app.json)",
-      "Bash(npm run typecheck)"
+      "Bash(npm run typecheck)",
+      "Bash(npx:*)"
     ],
     "deny": []
   }

@@ -68,7 +68,7 @@ class CheckInStore {
       runInAction(() => {
         const index = this.checkIns.findIndex(c => c.id === id)
         if (index !== -1 && updatedCheckIn) {
-          // 直接替换数组中的元素，MobX会自动追踪
+          // 替换整个对象引用，确保 MobX 可以检测到变化
           this.checkIns[index] = updatedCheckIn as CheckIn
         }
         this.loading = false

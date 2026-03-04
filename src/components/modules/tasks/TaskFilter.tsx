@@ -1,20 +1,16 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
+import type { TaskFilterOptions } from '../../../stores/TaskStore'
 import { Card, CardContent } from '../../ui/card'
 import { Input } from '../../ui/input'
 import { Button } from '../../ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 import { MagnifyingGlassIcon, Cross1Icon } from '@radix-ui/react-icons'
 
-interface FilterOptions {
-  searchText: string;
-  type: 'all' | 'work' | 'growth';
-  status: 'all' | 'pending' | 'in-progress' | 'completed';
-  priority: 'all' | 'high' | 'medium' | 'low';
-}
+// 使用从 TaskStore 导入的 TaskFilterOptions 类型
 
 interface TaskFilterProps {
-  onFilterChange: (options: FilterOptions) => void;
+  onFilterChange: (options: TaskFilterOptions) => void;
 }
 
 const TaskFilter = observer(({ onFilterChange }: TaskFilterProps) => {
@@ -23,18 +19,15 @@ const TaskFilter = observer(({ onFilterChange }: TaskFilterProps) => {
   const [status, setStatus] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all')
   const [priority, setPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all')
 
-  // 使用useMemo创建过滤选项对象，避免不必要的重新创建
-  const filterOptions = useMemo(() => ({
-    searchText,
-    type,
-    status,
-    priority,
-  }), [searchText, type, status, priority])
-
   // 当过滤选项变化时，通知父组件
   useEffect(() => {
-    onFilterChange(filterOptions)
-  }, [filterOptions, onFilterChange])
+    onFilterChange({
+      searchText,
+      type,
+      status,
+      priority
+    })
+  }, [searchText, type, status, priority, onFilterChange])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value)

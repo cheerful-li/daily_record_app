@@ -1,15 +1,38 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction, computed, observable } from 'mobx'
 import type { Relationship } from '../services/database'
 import { getById, queryByIndex } from '../services/database'
 import { add, update, remove, getAll } from '../services/enhancedDatabase'
+
+// 定义过滤选项接口
+export interface RelationshipFilterOptions {
+  name?: string;
+  category?: string;
+  nextContactFrom?: Date;
+  nextContactTo?: Date;
+  needsContactSoon?: boolean;
+  daysThreshold?: number;
+}
 
 class RelationshipStore {
   relationships: Relationship[] = []
   loading = false
   error: Error | null = null
+  
+  // 当前过滤选项
+  filterOptions: RelationshipFilterOptions = observable({
+    name: '',
+    category: '',
+    nextContactFrom: undefined,
+    nextContactTo: undefined,
+    needsContactSoon: false,
+    daysThreshold: 7
+  })
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      filteredRelationships: computed,
+      relationshipsNeedingContact: computed
+    })
     this.loadRelationships()
   }
 
@@ -159,46 +182,78 @@ class RelationshipStore {
     }
   }
 
-  // Get relationships that need contact soon
+  // 设置过滤选项方法
+  setFilterOptions(options: Partial<RelationshipFilterOptions>) {
+    Object.assign(this.filterOptions, options)
+  }
+  
+  // 计算需要待联系的关系
+  get relationshipsNeedingContact() {
+    return computed(() => {
+      const today = new Date()
+      const thresholdDate = new Date()
+      thresholdDate.setDate(today.getDate() + (this.filterOptions.daysThreshold || 7))
+      
+      return this.relationships.filter(relationship => 
+        relationship.nextContact && 
+        relationship.nextContact <= thresholdDate
+      )
+    }).get()
+  }
+  
+  // 兼容旧的方法
   getRelationshipsNeedingContact(daysThreshold = 7) {
-    const today = new Date()
-    const thresholdDate = new Date()
-    thresholdDate.setDate(today.getDate() + daysThreshold)
-    
-    return this.relationships.filter(relationship => 
-      relationship.nextContact && 
-      relationship.nextContact <= thresholdDate
-    )
+    this.setFilterOptions({ daysThreshold })
+    return this.relationshipsNeedingContact
   }
 
-  // Filter relationships in memory
+  // 使用computed计算过滤后的关系列表
+  get filteredRelationships() {
+    return computed(() => {
+      // 如果选择了只显示需要联系的关系
+      if (this.filterOptions.needsContactSoon) {
+        return this.relationshipsNeedingContact
+      }
+      
+      return this.relationships.filter(relationship => {
+        let match = true
+        
+        if (this.filterOptions.name && this.filterOptions.name.trim() !== '') {
+          match = match && relationship.name.toLowerCase().includes(this.filterOptions.name.toLowerCase())
+        }
+        
+        if (this.filterOptions.category && this.filterOptions.category.trim() !== '') {
+          match = match && relationship.category === this.filterOptions.category
+        }
+        
+        if (this.filterOptions.nextContactFrom !== undefined && relationship.nextContact) {
+          match = match && relationship.nextContact >= this.filterOptions.nextContactFrom
+        }
+        
+        if (this.filterOptions.nextContactTo !== undefined && relationship.nextContact) {
+          match = match && relationship.nextContact <= this.filterOptions.nextContactTo
+        }
+        
+        return match
+      })
+    }).get()
+  }
+  
+  // 旧的过滤方法（保留向后兼容）
   getFilteredRelationships(filter: {
     name?: string;
     category?: string;
     nextContactFrom?: Date;
     nextContactTo?: Date;
   }) {
-    return this.relationships.filter(relationship => {
-      let match = true
-      
-      if (filter.name !== undefined && filter.name.trim() !== '') {
-        match = match && relationship.name.toLowerCase().includes(filter.name.toLowerCase())
-      }
-      
-      if (filter.category !== undefined && filter.category.trim() !== '') {
-        match = match && relationship.category === filter.category
-      }
-      
-      if (filter.nextContactFrom !== undefined && relationship.nextContact) {
-        match = match && relationship.nextContact >= filter.nextContactFrom
-      }
-      
-      if (filter.nextContactTo !== undefined && relationship.nextContact) {
-        match = match && relationship.nextContact <= filter.nextContactTo
-      }
-      
-      return match
+    // 设置过滤选项
+    this.setFilterOptions({
+      ...filter,
+      needsContactSoon: false
     })
+    
+    // 返回计算后的结果
+    return this.filteredRelationships
   }
 }
 

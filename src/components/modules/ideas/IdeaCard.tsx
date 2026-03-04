@@ -34,7 +34,7 @@ const IdeaCard = observer(({ idea, onEdit, onDelete }: IdeaCardProps) => {
           </div>
           <div className="flex items-center text-xs text-muted-foreground">
             <CalendarIcon className="h-3.5 w-3.5 mr-1" />
-            <time dateTime={idea.date.toISOString()}>
+            <time dateTime={new Date(idea.date).toISOString()}>
               {formatDate(new Date(idea.date))}
             </time>
           </div>

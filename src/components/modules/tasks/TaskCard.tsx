@@ -15,7 +15,7 @@ import {
 import type { Task } from "../../../services/database"
 import {
   formatTaskStatus,
-  formatTaskPriority,
+  // formatTaskPriority,
 } from "../../../utils/formatters"
 
 interface TaskCardProps {
@@ -30,18 +30,18 @@ interface TaskCardProps {
 
 const TaskCard = observer(
   ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
-    const getPriorityColor = (priority: string) => {
-      switch (priority) {
-        case "high":
-          return "text-red-500"
-        case "medium":
-          return "text-yellow-500"
-        case "low":
-          return "text-green-500"
-        default:
-          return "text-muted-foreground"
-      }
-    }
+    // const getPriorityColor = (priority: string) => {
+    //   switch (priority) {
+    //     case "high":
+    //       return "text-red-500"
+    //     case "medium":
+    //       return "text-yellow-500"
+    //     case "low":
+    //       return "text-green-500"
+    //     default:
+    //       return "text-muted-foreground"
+    //   }
+    // }
 
     const getStatusColor = (status: string) => {
       switch (status) {

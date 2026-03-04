@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHabitStore } from '../../../stores/StoreContext'
+import { useConfirmDialog } from '../../common/ConfirmDialog'
 import { Button } from '../../ui/button'
 import { PlusIcon } from '@radix-ui/react-icons'
 import type { Habit } from '../../../services/database'
@@ -26,6 +27,7 @@ import SubPageLayout from '../../layout/SubPageLayout'
 
 const HabitSettings = observer(() => {
   const habitStore = useHabitStore()
+  const { confirm, dialog } = useConfirmDialog()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -49,9 +51,16 @@ const HabitSettings = observer(() => {
 
   const handleDeleteHabit = async (habitId: number | undefined) => {
     if (habitId) {
-      if (confirm('确定要删除这个习惯吗？')) {
-        await habitStore.deleteHabit(habitId)
-      }
+      confirm({
+        title: '删除习惯',
+        description: '确定要删除这个习惯吗？此操作无法撤销，且会同时删除相关的所有打卡记录。',
+        confirmText: '删除',
+        cancelText: '取消',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await habitStore.deleteHabit(habitId)
+        },
+      })
     }
   }
 
@@ -165,7 +174,7 @@ const HabitSettings = observer(() => {
                     </CardContent>
                     <CardFooter className="p-2 flex justify-end gap-3 bg-muted/20">
                       <Button 
-                        variant="outline" 
+                        variant="ghost" 
                         size="sm"
                         className="rounded-full px-4 h-8"
                         onClick={() => handleEditClick(habit)}
@@ -218,6 +227,7 @@ const HabitSettings = observer(() => {
         initialData={selectedHabit}
         isEditing={true}
       />
+      {dialog}
     </SubPageLayout>
   )
 })

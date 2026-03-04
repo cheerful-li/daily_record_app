@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { observer } from "mobx-react-lite"
 import { useIdeaStore } from "../../stores/StoreContext"
+import { useConfirmDialog } from "../common/ConfirmDialog"
 import { Button } from "../ui/button"
 import { PlusIcon, MixerHorizontalIcon } from "@radix-ui/react-icons"
 import type { Idea } from "../../services/database"
@@ -20,6 +21,7 @@ interface FilterOptions {
 
 const Ideas = observer(() => {
   const ideaStore = useIdeaStore()
+  const { confirm, dialog } = useConfirmDialog()
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedIdea, setSelectedIdea] = useState<Idea | undefined>()
@@ -123,9 +125,16 @@ const Ideas = observer(() => {
 
   const handleDeleteIdea = async (ideaId: number | undefined) => {
     if (ideaId) {
-      if (confirm("确定要删除这个想法吗？")) {
-        await ideaStore.deleteIdea(ideaId)
-      }
+      confirm({
+        title: '删除想法',
+        description: '确定要删除这个想法吗？此操作无法撤销。',
+        confirmText: '删除',
+        cancelText: '取消',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await ideaStore.deleteIdea(ideaId)
+        },
+      })
     }
   }
 
@@ -263,6 +272,7 @@ const Ideas = observer(() => {
         isEditing={true}
         categories={categories.length > 0 ? categories : ["灵感"]}
       />
+      {dialog}
     </div>
   )
 })

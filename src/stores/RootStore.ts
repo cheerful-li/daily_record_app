@@ -29,5 +29,6 @@ class RootStore {
 
 // Create a single instance of the root store
 const rootStore = new RootStore()
-
+// @ts-expect-error 测试啊
+window.rootStore = rootStore
 export default rootStore
