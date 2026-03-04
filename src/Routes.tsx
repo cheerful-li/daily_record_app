@@ -51,7 +51,20 @@ const router = createHashRouter([
           },
           {
             path: 'habits',
-            element: <Habits />,
+            children: [
+              {
+                index: true,
+                element: <Habits />,
+              },
+              {
+                path: 'settings',
+                element: <HabitSettings />,
+              },
+              {
+                path: 'history',
+                element: <CheckInHistoryPage />,
+              },
+            ],
           },
           {
             path: 'life-moments',
@@ -74,14 +87,6 @@ const router = createHashRouter([
             element: <Statistics />,
           },
         ],
-      },
-      {
-        path: '/habit-settings',
-        element: <HabitSettings />,
-      },
-      {
-        path: '/checkin-history',
-        element: <CheckInHistoryPage />,
       },
     ],
   },

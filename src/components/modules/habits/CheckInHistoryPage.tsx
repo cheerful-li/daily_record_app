@@ -15,17 +15,15 @@ import {
   CardHeader,
   CardTitle,
 } from '../../ui/card'
-import { Button } from '../../ui/button'
-import { ArrowLeftIcon, CalendarIcon } from '@radix-ui/react-icons'
+import { CalendarIcon } from '@radix-ui/react-icons'
 import { formatDate, formatCheckInStatus } from '../../../utils/formatters'
-import { useNavigate } from 'react-router-dom'
 import { ScrollArea } from '../../ui/scroll-area'
 import { Badge } from '../../ui/badge'
+import SubPageLayout from '../../layout/SubPageLayout'
 
 const CheckInHistoryPage = observer(() => {
   const habitStore = useHabitStore()
   const checkInStore = useCheckInStore()
-  const navigate = useNavigate()
   
   const [selectedHabitId, setSelectedHabitId] = useState<number | undefined>()
   const [timeRange, setTimeRange] = useState<'all' | 'month' | 'week'>('month')
@@ -35,9 +33,6 @@ const CheckInHistoryPage = observer(() => {
     checkInStore.loadCheckIns()
   }, [habitStore, checkInStore])
 
-  const handleBackToDashboard = () => {
-    navigate('/app/habits')
-  }
 
   // 根据时间范围过滤打卡记录
   const getFilteredCheckIns = () => {
@@ -83,21 +78,7 @@ const CheckInHistoryPage = observer(() => {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline"
-            size="icon"
-            onClick={handleBackToDashboard}
-            className="h-9 w-9"
-            aria-label="返回"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-          </Button>
-          <h1 className="text-3xl font-bold">打卡历史</h1>
-        </div>
-      </div>
+    <SubPageLayout title="打卡历史">
       
       <Card className="mb-8">
         <CardHeader>
@@ -182,7 +163,7 @@ const CheckInHistoryPage = observer(() => {
           </Card>
         </CardContent>
       </Card>
-    </div>
+    </SubPageLayout>
   )
 })
 

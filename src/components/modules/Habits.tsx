@@ -123,7 +123,7 @@ const Habits = observer(() => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate('/habit-settings')}
+            onClick={() => navigate('settings')}
             className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
           >
             <GearIcon className="md:mr-2 h-4 w-4" />
@@ -131,7 +131,7 @@ const Habits = observer(() => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate('/checkin-history')}
+            onClick={() => navigate('history')}
             className="flex items-center text-xs h-9 px-2 py-1 flex-grow sm:flex-grow-0"
           >
             <ClockIcon className="md:mr-2 h-4 w-4" />

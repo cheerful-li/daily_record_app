@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHabitStore } from '../../../stores/StoreContext'
 import { Button } from '../../ui/button'
-import { PlusIcon, ArrowLeftIcon } from '@radix-ui/react-icons'
+import { PlusIcon } from '@radix-ui/react-icons'
 import type { Habit } from '../../../services/database'
 import HabitForm from './HabitForm'
 import {
@@ -22,11 +22,10 @@ import {
   CardTitle,
 } from '../../ui/card'
 import { formatFrequency } from '../../../utils/formatters'
-import { useNavigate } from 'react-router-dom'
+import SubPageLayout from '../../layout/SubPageLayout'
 
 const HabitSettings = observer(() => {
   const habitStore = useHabitStore()
-  const navigate = useNavigate()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -61,31 +60,16 @@ const HabitSettings = observer(() => {
     setIsEditDialogOpen(true)
   }
 
-  const handleBackToDashboard = () => {
-    navigate('/app/habits')
-  }
+  // 添加习惯按钮作为headerAction传递
+  const addButton = (
+    <Button onClick={() => setIsAddDialogOpen(true)}>
+      <PlusIcon className="mr-2 h-4 w-4" />
+      添加习惯
+    </Button>
+  )
 
   return (
-    <div className="container mx-auto py-4 sm:py-6 pb-20 md:pb-6">
-      <div className="mb-4 sm:mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline"
-            size="icon"
-            onClick={handleBackToDashboard}
-            className="h-9 w-9"
-            aria-label="返回"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-          </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold">习惯设置</h1>
-        </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          添加习惯
-        </Button>
-      </div>
-
+    <SubPageLayout title="习惯设置" headerAction={addButton}>
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>习惯管理</CardTitle>
@@ -211,6 +195,14 @@ const HabitSettings = observer(() => {
         </CardFooter>
       </Card>
 
+      {/* 底部添加按钮 - 仅移动端显示 */}
+      <div className="fixed bottom-12 left-0 right-0 bg-background border-t p-4 flex justify-center z-30 md:hidden">
+        <Button onClick={() => setIsAddDialogOpen(true)} className="w-full max-w-xs">
+          <PlusIcon className="mr-2 h-4 w-4" />
+          添加习惯
+        </Button>
+      </div>
+
       {/* Add Habit Dialog */}
       <HabitForm
         open={isAddDialogOpen}
@@ -226,7 +218,7 @@ const HabitSettings = observer(() => {
         initialData={selectedHabit}
         isEditing={true}
       />
-    </div>
+    </SubPageLayout>
   )
 })
 

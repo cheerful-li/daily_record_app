@@ -120,3 +120,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Vite已在其他命令行运行，测试时不要再运行
    - Windows环境下执行命令注意格式
    - 使用浏览器开发工具检查移动端适配
+   - 你完成任务后记得要使用 npm run typecheck 检查类型错误
