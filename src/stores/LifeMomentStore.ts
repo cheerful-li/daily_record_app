@@ -167,14 +167,14 @@ class LifeMomentStore {
       const lifeMoments = await queryByIndex("lifeMoments", "by-date", date)
       runInAction(() => {
         this.loading = false
-        return lifeMoments
       })
+      return lifeMoments // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -187,14 +187,14 @@ class LifeMomentStore {
       const lifeMoments = await queryByIndex("lifeMoments", "by-tags", [tag])
       runInAction(() => {
         this.loading = false
-        return lifeMoments
       })
+      return lifeMoments // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 

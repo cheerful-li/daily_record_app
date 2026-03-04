@@ -43,8 +43,8 @@ class TaskStore {
       
       if (newTask) {
         runInAction(() => {
-          // 创建新数组以确保引用变化，触发MobX观察者更新
-          this.tasks = [...this.tasks, newTask as Task]
+          // MobX会自动追踪并触发更新
+          this.tasks.push(newTask as Task)
           this.loading = false
         })
       }
@@ -68,12 +68,8 @@ class TaskStore {
       runInAction(() => {
         const index = this.tasks.findIndex(t => t.id === id)
         if (index !== -1 && updatedTask) {
-          // 使用新数组以确保引用变化，触发MobX观察者更新
-          this.tasks = [
-            ...this.tasks.slice(0, index),
-            updatedTask as Task,
-            ...this.tasks.slice(index + 1)
-          ]
+          // 直接替换数组中的元素
+          this.tasks[index] = updatedTask as Task
         }
         this.loading = false
       })
@@ -93,8 +89,8 @@ class TaskStore {
     try {
       await remove('tasks', id)
       runInAction(() => {
-        // 创建新数组以确保引用变化，触发MobX观察者更新
-        this.tasks = [...this.tasks.filter(t => t.id !== id)]
+        // 无需展开运算符
+        this.tasks = this.tasks.filter(t => t.id !== id)
         this.loading = false
       })
     } catch (error) {
@@ -114,14 +110,14 @@ class TaskStore {
       const tasks = await queryByIndex('tasks', 'by-type', type)
       runInAction(() => {
         this.loading = false
-        return tasks
       })
+      return tasks // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -134,14 +130,14 @@ class TaskStore {
       const tasks = await queryByIndex('tasks', 'by-status', status)
       runInAction(() => {
         this.loading = false
-        return tasks
       })
+      return tasks // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -155,14 +151,14 @@ class TaskStore {
       const tasks = await queryByIndex('tasks', 'by-dueDate', dueDate)
       runInAction(() => {
         this.loading = false
-        return tasks
       })
+      return tasks // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -175,14 +171,14 @@ class TaskStore {
       const tasks = await queryByIndex('tasks', 'by-priority', priority)
       runInAction(() => {
         this.loading = false
-        return tasks
       })
+      return tasks // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 

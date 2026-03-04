@@ -43,8 +43,8 @@ class CheckInStore {
       
       if (newCheckIn) {
         runInAction(() => {
-          // 创建新数组以确保引用变化，触发MobX观察者更新
-          this.checkIns = [...this.checkIns, newCheckIn as CheckIn]
+          // MobX会自动追踪可观察对象的变化，直接push即可
+          this.checkIns.push(newCheckIn as CheckIn)
           this.loading = false
         })
       }
@@ -68,12 +68,8 @@ class CheckInStore {
       runInAction(() => {
         const index = this.checkIns.findIndex(c => c.id === id)
         if (index !== -1 && updatedCheckIn) {
-          // 使用新数组以确保引用变化，触发MobX观察者更新
-          this.checkIns = [
-            ...this.checkIns.slice(0, index),
-            updatedCheckIn as CheckIn,
-            ...this.checkIns.slice(index + 1)
-          ]
+          // 直接替换数组中的元素，MobX会自动追踪
+          this.checkIns[index] = updatedCheckIn as CheckIn
         }
         this.loading = false
       })
@@ -93,8 +89,8 @@ class CheckInStore {
     try {
       await remove('checkIns', id)
       runInAction(() => {
-        // 创建新数组以确保引用变化，触发MobX观察者更新
-        this.checkIns = [...this.checkIns.filter(c => c.id !== id)]
+        // filter本身会返回新数组，无需额外的展开运算符
+        this.checkIns = this.checkIns.filter(c => c.id !== id)
         this.loading = false
       })
     } catch (error) {
@@ -114,14 +110,14 @@ class CheckInStore {
       const checkIns = await queryByIndex('checkIns', 'by-habitId', habitId)
       runInAction(() => {
         this.loading = false
-        return checkIns
       })
+      return checkIns // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -135,14 +131,14 @@ class CheckInStore {
       const checkIns = await queryByIndex('checkIns', 'by-date', date)
       runInAction(() => {
         this.loading = false
-        return checkIns
       })
+      return checkIns // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -155,14 +151,14 @@ class CheckInStore {
       const checkIns = await queryByIndex('checkIns', 'by-status', status)
       runInAction(() => {
         this.loading = false
-        return checkIns
       })
+      return checkIns // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 

@@ -43,8 +43,7 @@ class HabitStore {
       
       if (newHabit) {
         runInAction(() => {
-          // 创建新数组以确保引用变化，触发MobX观察者更新
-          this.habits = [...this.habits, newHabit as Habit]
+          this.habits.push(newHabit as Habit) // 直接修改数组，MobX会自动追踪
           this.loading = false
         })
       }
@@ -68,12 +67,7 @@ class HabitStore {
       runInAction(() => {
         const index = this.habits.findIndex(h => h.id === id)
         if (index !== -1 && updatedHabit) {
-          // 使用新数组以确保引用变化，触发MobX观察者更新
-          this.habits = [
-            ...this.habits.slice(0, index),
-            updatedHabit as Habit,
-            ...this.habits.slice(index + 1)
-          ]
+          this.habits[index] = updatedHabit as Habit // 直接修改数组元素
         }
         this.loading = false
       })
@@ -93,8 +87,8 @@ class HabitStore {
     try {
       await remove('habits', id)
       runInAction(() => {
-        // 创建新数组以确保引用变化，触发MobX观察者更新
-        this.habits = [...this.habits.filter(h => h.id !== id)]
+        // MobX会自动追踪数组变化，无需创建新数组
+        this.habits = this.habits.filter(h => h.id !== id)
         this.loading = false
       })
     } catch (error) {
@@ -114,14 +108,14 @@ class HabitStore {
       const habits = await queryByIndex('habits', 'by-frequency', frequency)
       runInAction(() => {
         this.loading = false
-        return habits
       })
+      return habits // 修正返回值位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 修正返回值位置
     }
   }
 
@@ -134,14 +128,14 @@ class HabitStore {
       const habits = await queryByIndex('habits', 'by-active', true)
       runInAction(() => {
         this.loading = false
-        return habits
       })
+      return habits // 修正返回值位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 修正返回值位置
     }
   }
 

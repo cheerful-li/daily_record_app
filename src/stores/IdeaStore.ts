@@ -115,14 +115,14 @@ class IdeaStore {
       const ideas = await queryByIndex('ideas', 'by-date', date)
       runInAction(() => {
         this.loading = false
-        return ideas
       })
+      return ideas // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -135,14 +135,14 @@ class IdeaStore {
       const ideas = await queryByIndex('ideas', 'by-category', category)
       runInAction(() => {
         this.loading = false
-        return ideas
       })
+      return ideas // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 

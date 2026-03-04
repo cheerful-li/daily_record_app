@@ -107,14 +107,14 @@ class RelationshipStore {
       const relationships = await queryByIndex('relationships', 'by-name', name)
       runInAction(() => {
         this.loading = false
-        return relationships
       })
+      return relationships // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -127,14 +127,14 @@ class RelationshipStore {
       const relationships = await queryByIndex('relationships', 'by-category', category)
       runInAction(() => {
         this.loading = false
-        return relationships
       })
+      return relationships // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
@@ -148,14 +148,14 @@ class RelationshipStore {
       const relationships = await queryByIndex('relationships', 'by-nextContact', nextContact)
       runInAction(() => {
         this.loading = false
-        return relationships
       })
+      return relationships // 正确的返回位置
     } catch (error) {
       runInAction(() => {
         this.error = error instanceof Error ? error : new Error(String(error))
         this.loading = false
-        return []
       })
+      return [] // 正确的返回位置
     }
   }
 
